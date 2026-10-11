@@ -29,7 +29,7 @@ Everything it does is logged to `BepInEx/webui-doctor.log`.
 
 ## Install
 
-Copy `WebUIDoctor.dll` into `BepInEx/plugins`. Needs BepInEx 6 (IL2CPP build).
+Download `WebUIDoctor.dll` from the [latest release](https://github.com/AnExiledDev/SurvivalLog-WebUIDoctor/releases/latest) and copy it into `BepInEx/plugins`. Needs BepInEx 6 (IL2CPP build).
 
 ## Build and test
 
@@ -39,6 +39,10 @@ dotnet test tests/WebUIDoctor.Tests
 ```
 
 The build references BepInEx and the game's interop assemblies under `GameDir`, so BepInEx must be installed and the game launched once. The tests compile only the pure `Core` code and need nothing from the game.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
 
 ## Provenance
 
