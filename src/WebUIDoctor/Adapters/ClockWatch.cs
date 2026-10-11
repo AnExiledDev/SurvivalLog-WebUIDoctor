@@ -171,5 +171,5 @@ internal sealed class ClockWatch
         }));
     }
 
-    private static GameTimeManager? GameTime() => BaseSingleton<BattleLogicWorld>.Instance?._GameTimeManager;
+    private static GameTimeManager? GameTime() => GameSingleton.Existing<BattleLogicWorld>()?._GameTimeManager;
 }

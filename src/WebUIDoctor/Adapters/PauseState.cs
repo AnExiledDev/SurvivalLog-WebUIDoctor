@@ -11,8 +11,8 @@ internal static class PauseState
 {
     public static void Heal(RepairTrigger trigger, Action<string> log)
     {
-        var world = BaseSingleton<BattleLogicWorld>.Instance;
-        var camera = BaseSingleton<BattleShowWorld>.Instance?._CameraManager;
+        var world = GameSingleton.Existing<BattleLogicWorld>();
+        var camera = GameSingleton.Existing<BattleShowWorld>()?._CameraManager;
 
         if (world == null || camera == null)
         {
