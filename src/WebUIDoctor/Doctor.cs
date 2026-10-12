@@ -28,6 +28,7 @@ internal sealed class Doctor
     private readonly RepairHotkey _probeHotkey;
     private readonly PageProbe _probe;
     private readonly ClockWatch _clock;
+    private readonly ClickWatch _clicks;
     private RetryState _state = RetryState.Initial;
     private WebUILayer? _layer;
     private bool _hasLoggedSettings;
@@ -42,7 +43,7 @@ internal sealed class Doctor
     private readonly HashSet<string> _reportedFaults = new();
     private readonly (string Name, Action<WebUILayer, DateTime> Run)[] _steps;
 
-    public Doctor(DoctorLog log, RetrySettings settings, bool isHardRestartEnabled, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock)
+    public Doctor(DoctorLog log, RetrySettings settings, bool isHardRestartEnabled, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock, ClickWatch clicks)
     {
         _log = log;
         _settings = settings;
@@ -52,6 +53,7 @@ internal sealed class Doctor
         _probeHotkey = probeHotkey;
         _probe = probe;
         _clock = clock;
+        _clicks = clicks;
 
         // Retry first: it is the step that gets the UI back, so a failure in a diagnostic step must not starve it.
         _steps = new (string, Action<WebUILayer, DateTime>)[]
@@ -62,6 +64,7 @@ internal sealed class Doctor
             ("repair finish", FinishRepairWhenDue),
             ("page probe", ProbePageLink),
             ("clock watch", (layer, now) => _clock.Tick(layer, now)),
+            ("click second look", (_, now) => _clicks.Tick(now)),
         };
     }
 
@@ -255,7 +258,7 @@ internal sealed class Doctor
         if (_pendingRepairFinish is not { } pending || now < pending.DueAt) return;
 
         _pendingRepairFinish = null;
-        UiRepair.Finish(layer, pending.Trigger, _log.Write);
+        UiRepair.Finish(layer, pending.Trigger, _clicks, now, _log.Write);
         _probeAfterRepairAt = now + ProbeAfterRepairDelay;
         _clock.CheckAt(now + ClockCheckAfterRepairDelay);
     }

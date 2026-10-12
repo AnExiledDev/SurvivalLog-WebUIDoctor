@@ -34,7 +34,8 @@ public sealed class Plugin : BasePlugin
             Backoff: new[] { TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(2) });
         var probe = new PageProbe(log.Write);
         var doctor = new Doctor(log, settings, isHardRestartEnabled, gamePid,
-            new RepairHotkey(KeyCode.F12, log.Write), new RepairHotkey(KeyCode.F11, log.Write), probe, new ClockWatch(log.Write));
+            new RepairHotkey(KeyCode.F12, log.Write), new RepairHotkey(KeyCode.F11, log.Write), probe, new ClockWatch(log.Write),
+            new ClickWatch(log.Write));
 
         log.Write($"===== WebUI Doctor {Version} started, game pid {gamePid}, hardRestart={isHardRestartEnabled} " +
                   $"backoff=[{string.Join(", ", settings.Backoff.Select(wait => $"{wait.TotalSeconds:0}s"))}] forgiveAfter={settings.ForgiveAfter.TotalMinutes:0}min");
