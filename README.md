@@ -11,6 +11,7 @@ Survival Log draws its menus and HUD with an embedded Chromium browser. When tha
 - **Backup check**: if the game gives up without the mod's hook seeing it, a once-a-second check of the game's own give-up flag catches it. In that case the error dialog may show for a moment before the repair closes it.
 - **UI repair after every recovery**: after any recovery, the mod's own or the game's, it gives mouse clicks back to the UI, closes the game's error dialog with the game's own close action, and a second later hides any leftover error panel (found by its text, in English or Chinese).
 - **Stuck pause release**: a crash can leave the game paused with no window open. After a repair the mod checks the pause. If you paused with the speed control, it is left alone. If the game says an open window holds the pause, it is left alone too. Otherwise the pause is treated as left over from the crash and the game is resumed.
+- **Clicks on the world come back**: clicking an object while the UI was gone could leave every object unclickable afterwards, with no menu to explore, sleep or use anything. After a repair the mod checks whether clicks still reach the world. If the game says an object menu or trap panel is open, it is left alone; otherwise clicks are given back. `Ctrl+F12` also closes an object menu or trap panel that is holding the clicks.
 - **Manual repair**: `Ctrl+F12` runs the same repair by hand. It releases a stuck pause even when the game thinks a window is still open (the hidden error dialog itself can count as one), but never a pause you set with the speed control.
 - **Keeps other UI mods working**: the game starts its recovered browser without the page-access flags that UI mods rely on. The mod hands those flags back as soon as a crash shows and before each of its own recoveries, so mods that add to the game's pages keep working after a recovery.
 - **UI clock check**: once a minute (and 40 seconds after each repair) it compares the clock the UI shows with the game's own time. If they are more than 30 game minutes apart, it asks the game to send the time again; if the UI is still off 3 seconds later, it puts the time on the page itself, and if even that does not take, it logs it and tries again at the next check. It never changes the game's time, only what the UI shows.
@@ -24,7 +25,7 @@ WebUI Doctor writes nothing into your save. It closes and restarts the game's ow
 
 | Key | What it does |
 | --- | --- |
-| `Ctrl+F12` | Repairs the UI by hand: gives clicks back, closes the error dialog and releases a stuck pause. |
+| `Ctrl+F12` | Repairs the UI by hand: gives clicks back (on the UI and on the world), closes the error dialog and releases a stuck pause. |
 | `Ctrl+F11` | Checks whether other UI mods can reach the game's page and logs the result. Changes nothing. |
 
 Either Ctrl key works. The keys are fixed and cannot be changed in the config. If the game's input does not support them, they turn themselves off and the log says so.
@@ -69,9 +70,13 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 
 Tested on Survival Log 1.1.18317 with BepInEx `6.0.0-be.788`.
 
-Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.3.6 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.3.7 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
 
 If the error dialog still shows, look in `BepInEx\webui-doctor.log` for "game gave up recovering the UI". If `EnableHardRestart` is off, the line says so.
+
+## Changelog
+
+- 0.3.7: After the UI comes back, clicking objects opens their menu again. A click made while the UI was gone could leave every object unclickable, so you could not explore or sleep. The repair after a recovery now fixes that, and so does `Ctrl+F12`.
 
 ## Feedback and bug reports
 
@@ -87,7 +92,7 @@ dotnet build src/WebUIDoctor -c Release -p:GameDir="C:\path\to\Survival Log"
 
 `GameDir` is the game folder. The default in the project file is a local path you will almost certainly need to override. The output DLL is at `src\WebUIDoctor\bin\Release\WebUIDoctor.dll`.
 
-The unit tests cover the pure rules (retry timing, pause release, clock drift, error dialog text, process tree and exit codes) and need nothing from the game:
+The unit tests cover the pure rules (retry timing, pause release, world clicks, clock drift, error dialog text, process tree and exit codes) and need nothing from the game:
 
 ```
 dotnet test tests/WebUIDoctor.Tests

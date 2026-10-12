@@ -30,7 +30,8 @@ internal static class UiRepair
 
     /// <summary>
     /// Hides the error screen only if the game's own close left it up (hiding it bypasses the game's bookkeeping,
-    /// which is how 0.2.1 left the world paused), then releases any pause the crash left behind.
+    /// which is how 0.2.1 left the world paused), then releases any pause the crash left behind and gives clicks on the
+    /// world back if a menu that never appeared took them.
     /// </summary>
     public static void Finish(WebUILayer layer, RepairTrigger trigger, Action<string> log)
     {
@@ -38,6 +39,7 @@ internal static class UiRepair
 
         log(hidden == 0 ? "UI repair: no error dialog left on screen" : $"UI repair: the game's close action left {hidden} dialog panel(s) up; hid them by hand");
         PauseState.Heal(trigger, log);
+        ClickState.Heal(trigger, log);
         DumpCanvases(layer, log);
         log($"UI repair ({trigger}) done");
     }
