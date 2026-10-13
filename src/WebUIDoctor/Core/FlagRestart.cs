@@ -23,8 +23,9 @@ public enum FlagCheckOutcome
 
 /// <summary>
 /// Decides, after a recovery, whether the relaunched Chromium came up without the page-access flags and gets one
-/// restart for it. The restart is spent by restarting and given back only once a browser is seen with its flags, so a
-/// restart that does not bring them back is never repeated: at most one per crash, never a loop.
+/// restart for it. The restart is spent by restarting and given back only once a browser is seen with its flags, so
+/// after a restart that does not bring them back, no further crash gets a forced restart until a browser shows its
+/// flags again. It can never loop.
 /// </summary>
 public static class FlagRestart
 {

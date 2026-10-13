@@ -8,7 +8,7 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 | --- | --- | --- |
 | `EnableHardRestart` | `true` | When the game gives up recovering its UI, close its Chromium processes and make it try again instead of showing the error. |
 
-With `false`, the mod logs that the game gave up and lets the game's error dialog show. The UI repair after the game's own recoveries, the clock check and both hotkeys keep working.
+With `false`, the mod logs that the game gave up and lets the game's error dialog show. The UI repair after the game's own recoveries, the clock check and both hotkeys keep working. The single browser restart that brings back the settings other UI mods need also still happens, whatever this setting says.
 
 ## Diagnostics
 

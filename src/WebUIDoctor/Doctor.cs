@@ -268,11 +268,13 @@ internal sealed class Doctor
         if (_pendingRepairFinish is not { } pending || now < pending.DueAt) return;
 
         _pendingRepairFinish = null;
+
+        // Set before the repair runs, so a repair that throws cannot skip the flag check.
+        if (pending.Trigger == RepairTrigger.AfterRecovery) _flagCheckAt = now;
+
         UiRepair.Finish(layer, pending.Trigger, _clicks, now, _log.Write);
         _probeAfterRepairAt = now + ProbeAfterRepairDelay;
         _clock.CheckAt(now + ClockCheckAfterRepairDelay);
-
-        if (pending.Trigger == RepairTrigger.AfterRecovery) _flagCheckAt = now;
     }
 
     /// <summary>

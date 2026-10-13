@@ -55,6 +55,17 @@ public class FlagRestartTests
         Assert.Equal(FlagCheckOutcome.FlagsPresent, outcome);
     }
 
+    [Fact]
+    public void A_flagless_browser_left_over_beside_a_flagged_one_still_gets_the_restart()
+    {
+        // The game's terminate can time out and leave the old flagless browser running next to the new one.
+        // The check cannot tell which browser hosts the UI, so every browser must carry the flags.
+        var (outcome, isSpent) = CheckAfterRecovery(new[] { BrowserWithFlags, BrowserWithoutFlags }, isRestartSpent: false);
+
+        Assert.Equal(FlagCheckOutcome.RestartBrowser, outcome);
+        Assert.True(isSpent);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
