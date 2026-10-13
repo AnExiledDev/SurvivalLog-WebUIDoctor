@@ -125,13 +125,21 @@ internal sealed class PageProbe
             probe.LayerUpdates,
             HasScriptReply: probe.ScriptReply is not null,
             HasMessageReply: probe.MessageReply is not null,
-            PageLink.MissingModScripts(reply, probe.LoadedGlobals));
+            PageLink.MissingModScripts(reply, probe.LoadedGlobals),
+            PageLink.BlockedFrames(reply));
         var missing = result.MissingModScripts.Count == 0 ? "none" : string.Join(", ", result.MissingModScripts);
+        var blocked = result.BlockedFrames.Count == 0 ? "none" : string.Join("; ", result.BlockedFrames);
 
         _log($"page link probe {probe.Id} ({probe.Reason}): script reply={Show(probe.ScriptReply)} page message={Show(probe.MessageReply)}");
-        _log($"page link probe {probe.Id} ({probe.Reason}): layer updates={probe.LayerUpdates} mod page messages={probe.ModMessages} missing mod scripts={missing}");
-        _log($"page link verdict {probe.Id} ({probe.Reason}): {PageLink.Decide(result)}");
+        _log($"page link probe {probe.Id} ({probe.Reason}): layer updates={probe.LayerUpdates} mod page messages={probe.ModMessages} " +
+             $"missing mod scripts={missing} blocked frames={blocked}");
+        _log($"page link verdict {probe.Id} ({probe.Reason}): {Explain(PageLink.Decide(result), blocked)}");
     }
+
+    private static string Explain(PageLinkVerdict verdict, string blocked) =>
+        verdict == PageLinkVerdict.FramesBlocked
+            ? $"{verdict} - broken: the page cannot read its frames, so mods that add to game windows fail. Blocked: {blocked}"
+            : verdict.ToString();
 
     /// <summary>Logs every webview the game has, and returns how many live ones are not the layer's.</summary>
     private int LogWebViews(string id, string reason, BaseWebView? layerWebView)
@@ -170,16 +178,21 @@ internal sealed class PageProbe
         return UiMods.Where(mod => plugins.ContainsKey(mod.Guid)).Select(mod => mod.PageGlobal).ToList();
     }
 
-    /// <summary>Answers on both channels with the page's state; each mod's global is checked whether or not that mod is loaded.</summary>
+    /// <summary>
+    /// Answers on both channels with the page's state; each mod's global is checked whether or not that mod is loaded.
+    /// Every frame's document is read the way the page mods read it, and each read that throws is listed under "blocked".
+    /// </summary>
     private static string ProbeScript(string id)
     {
         var globals = string.Join(",", UiMods.Select(mod => $"'{mod.PageGlobal}'"));
 
         return "(function(){try{" +
-               $"var r={{id:'{id}',url:location.href,ready:document.readyState,mods:{{}},frames:[]}};" +
+               $"var r={{id:'{id}',url:location.href,ready:document.readyState,mods:{{}},frames:[],blocked:[]}};" +
                $"[{globals}].forEach(function(n){{r.mods[n]=!!window[n];}});" +
                "var f=document.getElementsByTagName('iframe');" +
-               "for(var i=0;i<f.length;i++){r.frames.push((f[i].getAttribute('src')||'').split('?')[0].split('/').pop());}" +
+               "for(var i=0;i<f.length;i++){var n=(f[i].getAttribute('src')||'').split('?')[0].split('/').pop();r.frames.push(n);" +
+               "try{f[i].contentWindow.document.readyState;}" +
+               "catch(e){r.blocked.push({frame:n,error:((e&&e.name)||'Error')+': '+((e&&e.message)||String(e))});}}" +
                "var j=JSON.stringify(r);" +
                $"try{{window.vuplex.postMessage('{MessagePrefix}'+j);}}catch(e){{r.post=String(e);j=JSON.stringify(r);}}" +
                "return j;" +

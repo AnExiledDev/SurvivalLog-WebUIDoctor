@@ -35,4 +35,14 @@ public class ChromiumProcessTests
     {
         Assert.Equal(expected, ChromiumProcess.HasPageAccessFlags(commandLine));
     }
+
+    [Theory]
+    [InlineData(false, "--disable-web-security --allow-file-access-from-files")]
+    [InlineData(true, "--disable-web-security --allow-file-access-from-files --no-sandbox")]
+    public void A_relaunch_gets_the_same_arguments_the_game_started_chromium_with(bool isSandboxOff, string expected)
+    {
+        // The game's startup string, read from WebUILayer.Initialize: dropping --no-sandbox would start a browser
+        // the game had already found could not run sandboxed.
+        Assert.Equal(expected, ChromiumProcess.LaunchArguments(isSandboxOff));
+    }
 }

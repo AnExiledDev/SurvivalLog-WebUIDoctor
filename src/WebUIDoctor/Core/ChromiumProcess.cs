@@ -14,6 +14,12 @@ public static class ChromiumProcess
     /// </summary>
     public const string PageAccessFlags = "--disable-web-security --allow-file-access-from-files";
 
+    /// <summary>
+    /// The exact argument string the game hands Chromium at startup: the page-access flags, plus --no-sandbox when the
+    /// game found the sandbox unusable. A relaunch gets the same string, so it starts the browser the game would.
+    /// </summary>
+    public static string LaunchArguments(bool isSandboxOff) => isSandboxOff ? PageAccessFlags + " --no-sandbox" : PageAccessFlags;
+
     /// <summary>"browser", "renderer", "gpu-process", "utility:network.mojom.NetworkService", or "unknown".</summary>
     public static string KindOf(string? commandLine)
     {

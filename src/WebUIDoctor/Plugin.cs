@@ -14,7 +14,7 @@ namespace WebUIDoctor;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.3.7";
+    private const string Version = "0.3.8";
 
     public override void Load()
     {

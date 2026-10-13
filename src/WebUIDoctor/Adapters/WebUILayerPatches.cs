@@ -25,6 +25,7 @@ internal static class WebUILayerPatches
         Patch(harmony, "OnUpdate", postfix: nameof(OnUpdatePostfix));
         Patch(harmony, "NotifyRecoverAbandoned", prefix: nameof(NotifyRecoverAbandonedPrefix));
         Patch(harmony, "RecoverWebView", prefix: nameof(RecoverWebViewPrefix));
+        Patch(harmony, "StartChromiumPipeWatchdog", prefix: nameof(StartChromiumPipeWatchdogPrefix));
         Patch(harmony, "OnWebViewTerminated", prefix: nameof(OnWebViewTerminatedPrefix));
         Patch(harmony, "OnBrowserProcessFailed", prefix: nameof(OnBrowserProcessFailedPrefix));
         Patch(harmony, "LogInitFailure", prefix: nameof(LogInitFailurePrefix));
@@ -107,6 +108,9 @@ internal static class WebUILayerPatches
 
     private static void RecoverWebViewPrefix(WebUILayer __instance) =>
         Guard("RecoverWebView", () => _doctor.OnOurRecoveryStarted(__instance));
+
+    private static void StartChromiumPipeWatchdogPrefix(WebUILayer __instance) =>
+        Guard("StartChromiumPipeWatchdog", () => _doctor.OnBrowserAboutToStart(__instance));
 
     private static void OnWebViewTerminatedPrefix(WebUILayer __instance, TerminatedEventArgs e) =>
         Guard("OnWebViewTerminated", () =>

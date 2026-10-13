@@ -1,21 +1,22 @@
 using System;
 using Vuplex.WebView;
-using WebUIDoctor.Core;
 
 namespace WebUIDoctor.Adapters;
 
 /// <summary>
-/// Hands Chromium the game's page-access flags again before a recovery starts it anew. The game sets them once at
-/// startup, and a Chromium restarted by recovery comes up without them, which cuts every page mod off its frames.
+/// Hands Chromium its launch arguments again before the game starts it anew. The game sets them once at startup,
+/// and a Chromium relaunched by a recovery comes up without them, which cuts every page mod off its frames. Vuplex
+/// refuses arguments while its browser process counts as running, so this only works between the game's
+/// TerminateBrowserProcess and its next webview.
 /// </summary>
 internal static class BrowserFlags
 {
-    public static void Restore(Action<string> log)
+    public static void HandOver(string arguments, Action<string> log)
     {
         try
         {
-            StandaloneWebView.SetCommandLineArguments(ChromiumProcess.PageAccessFlags);
-            log("page-access flags handed to Chromium for the restart");
+            StandaloneWebView.SetCommandLineArguments(arguments);
+            log($"Chromium launch arguments handed over for the next browser start: {arguments}");
 
             return;
         }
@@ -26,8 +27,8 @@ internal static class BrowserFlags
 
         try
         {
-            var isAccepted = StandaloneWebView.WebView_setCommandLineArguments(ChromiumProcess.PageAccessFlags);
-            log("native setCommandLineArguments " + (isAccepted ? "accepted the page-access flags" : "refused the page-access flags"));
+            var isAccepted = StandaloneWebView.WebView_setCommandLineArguments(arguments);
+            log("native setCommandLineArguments " + (isAccepted ? "accepted" : "refused") + $" the launch arguments: {arguments}");
         }
         catch (Exception ex)
         {

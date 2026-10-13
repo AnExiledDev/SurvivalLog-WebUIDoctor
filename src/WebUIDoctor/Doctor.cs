@@ -39,6 +39,8 @@ internal sealed class Doctor
     private (DateTime DueAt, RepairTrigger Trigger)? _pendingRepairFinish;
     private DateTime? _baselineProbeAt;
     private DateTime? _probeAfterRepairAt;
+    private DateTime? _flagCheckAt;
+    private bool _isFlagRestartSpent;
     private RecoveryFlags _flags;
     private readonly HashSet<string> _reportedFaults = new();
     private readonly (string Name, Action<WebUILayer, DateTime> Run)[] _steps;
@@ -62,6 +64,7 @@ internal sealed class Doctor
             ("flag watch", WatchFlags),
             ("repair hotkey", RepairOnHotkey),
             ("repair finish", FinishRepairWhenDue),
+            ("browser flag check", CheckBrowserFlagsWhenDue),
             ("page probe", ProbePageLink),
             ("clock watch", (layer, now) => _clock.Tick(layer, now)),
             ("click second look", (_, now) => _clicks.Tick(now)),
@@ -101,9 +104,16 @@ internal sealed class Doctor
     {
         SeeLayer(layer);
         _log.Write($"game recovery starting: attempts={layer.recoverAttempts} crashed={layer.isBrowserCrashed} needsRecover={layer.needsRecover}");
-        BrowserFlags.Restore(_log.Write);
         _state = AbandonRetry.OnOurRecoveryStarted(_state, DateTime.UtcNow, _settings);
     }
+
+    /// <summary>
+    /// StartChromiumPipeWatchdog prefix. The game calls it right after TerminateBrowserProcess and right before it
+    /// creates the UI webview, at startup, on an init retry and in every recovery, so Vuplex accepts launch arguments
+    /// here. A recovery's relaunch otherwise comes up without the page-access flags.
+    /// </summary>
+    public void OnBrowserAboutToStart(WebUILayer layer) =>
+        BrowserFlags.HandOver(ChromiumProcess.LaunchArguments(layer.noSandboxEnabled), _log.Write);
 
     public void Tick()
     {
@@ -261,6 +271,8 @@ internal sealed class Doctor
         UiRepair.Finish(layer, pending.Trigger, _clicks, now, _log.Write);
         _probeAfterRepairAt = now + ProbeAfterRepairDelay;
         _clock.CheckAt(now + ClockCheckAfterRepairDelay);
+
+        if (pending.Trigger == RepairTrigger.AfterRecovery) _flagCheckAt = now;
     }
 
     /// <summary>
@@ -306,23 +318,56 @@ internal sealed class Doctor
             _log.Write($"UI stayed up for {_settings.ForgiveAfter.TotalMinutes:0} min; the next interface error is retried without waiting");
     }
 
-    /// <summary>
-    /// Logs every change to the game's recovery flags, to show how its retry counter runs out, and hands Chromium
-    /// its page-access flags the moment a crash shows: the game's own recovery restarts Chromium without them and
-    /// never passes through our RecoverWebView hook.
-    /// </summary>
+    /// <summary>Logs every change to the game's recovery flags, to show how its retry counter runs out.</summary>
     private void WatchFlags(WebUILayer layer, DateTime now)
     {
         var flags = _flags;
 
         if (flags == _lastFlags) return;
 
-        var hasJustCrashed = flags.IsCrashed && _lastFlags is not { IsCrashed: true };
-
         _lastFlags = flags;
         _log.Write("game recovery flags: " + flags);
+    }
 
-        if (hasJustCrashed) BrowserFlags.Restore(_log.Write);
+    /// <summary>
+    /// A moment after each recovery, reads the relaunched browser's command line. Without the page-access flags every
+    /// page mod is cut off, so the browser gets one restart through the game's own recovery, which passes the
+    /// StartChromiumPipeWatchdog hook that hands the flags over.
+    /// </summary>
+    private void CheckBrowserFlagsWhenDue(WebUILayer layer, DateTime now)
+    {
+        if (_flagCheckAt is not { } dueAt || now < dueAt) return;
+
+        _flagCheckAt = null;
+
+        var isRecoveryUnderWay = _flags.IsCrashed || _flags.IsRecovering || _state is not RetryState.Idle;
+        var (outcome, isRestartSpent) = FlagRestart.Decide(WindowsProcesses.ChromiumCommandLinesUnder(_gamePid), isRecoveryUnderWay, _isFlagRestartSpent);
+
+        _isFlagRestartSpent = isRestartSpent;
+
+        switch (outcome)
+        {
+            case FlagCheckOutcome.FlagsPresent:
+                _log.Write("flag check after recovery: the browser has its page-access flags");
+                return;
+            case FlagCheckOutcome.BrowserNotFound:
+                _log.Write("flag check after recovery: no browser process with a readable command line; nothing done");
+                return;
+            case FlagCheckOutcome.RecoveryUnderWay:
+                _log.Write("flag check after recovery skipped: another recovery is under way and gets its own check");
+                return;
+            case FlagCheckOutcome.GiveUp:
+                _log.Write("flag check after recovery: the browser is still missing its page-access flags after the one restart; " +
+                           "not restarting again. UI mods that add to the game's windows may not work until the game is restarted");
+                return;
+            case FlagCheckOutcome.RestartBrowser:
+                _log.Write("flag check after recovery: the browser is missing its page-access flags; restarting it once through the game's recovery");
+                _probeAfterRepairAt = null;
+                layer.RecoverWebView();
+                return;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(outcome), outcome, null);
+        }
     }
 
     private void LogGameRecoverySettings()

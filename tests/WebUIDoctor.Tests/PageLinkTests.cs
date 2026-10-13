@@ -12,7 +12,13 @@ public class PageLinkTests
         LayerUpdatesDuringProbe: 600,
         HasScriptReply: true,
         HasMessageReply: true,
-        MissingModScripts: Array.Empty<string>());
+        MissingModScripts: Array.Empty<string>(),
+        BlockedFrames: Array.Empty<BlockedFrame>());
+
+    /// <summary>The Root page's own words when Chromium runs without the page-access flags (crafting-hub.log, 2026-10-12).</summary>
+    private static readonly BlockedFrame CrossOriginCooking = new(
+        "Cooking.html",
+        "SecurityError: Failed to read a named property 'document' from 'Window': Blocked a frame with origin \"null\" from accessing a cross-origin frame.");
 
     [Fact]
     public void A_page_that_answers_on_both_channels_with_every_mod_script_present_is_healthy()
@@ -53,6 +59,46 @@ public class PageLinkTests
         var probe = AllWorking with { HasScriptReply = hasScriptReply, HasMessageReply = hasMessageReply };
 
         Assert.Equal(expected, PageLink.Decide(probe));
+    }
+
+    [Fact]
+    public void A_page_that_cannot_read_its_frames_is_broken_even_with_every_channel_and_mod_script_working()
+    {
+        // The probes after the crash seen in play answered on both channels with every mod global set and were called
+        // Healthy, while the cooking mod's window failed on exactly this error.
+        var blocked = AllWorking with { BlockedFrames = new[] { CrossOriginCooking } };
+
+        Assert.Equal(PageLinkVerdict.FramesBlocked, PageLink.Decide(blocked));
+    }
+
+    [Fact]
+    public void Blocked_frames_are_named_ahead_of_a_missing_mod_script_because_the_script_could_not_have_worked()
+    {
+        var both = AllWorking with { BlockedFrames = new[] { CrossOriginCooking }, MissingModScripts = new[] { "__projectCook" } };
+
+        Assert.Equal(PageLinkVerdict.FramesBlocked, PageLink.Decide(both));
+    }
+
+    [Fact]
+    public void Each_blocked_frame_is_read_from_the_reply_with_the_error_it_threw()
+    {
+        const string reply =
+            "{\"id\":\"p2\",\"mods\":{\"__projectCook\":true},\"frames\":[\"CoreUI1.html\",\"Cooking.html\"]," +
+            "\"blocked\":[{\"frame\":\"Cooking.html\",\"error\":\"SecurityError: Failed to read a named property 'document' from 'Window': " +
+            "Blocked a frame with origin \\\"null\\\" from accessing a cross-origin frame.\"}]}";
+
+        Assert.Equal(new[] { CrossOriginCooking }, PageLink.BlockedFrames(reply));
+    }
+
+    [Theory]
+    [InlineData("{\"id\":\"p1\",\"frames\":[\"CoreUI1.html\"],\"blocked\":[]}")]
+    [InlineData("{\"id\":\"p1\",\"frames\":[\"CoreUI1.html\"]}")]
+    [InlineData("probe error: ReferenceError: x is not defined")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void A_reply_that_lists_no_blocked_frame_blocks_nothing(string? reply)
+    {
+        Assert.Empty(PageLink.BlockedFrames(reply));
     }
 
     [Fact]

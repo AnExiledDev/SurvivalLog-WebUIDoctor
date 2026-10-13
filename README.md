@@ -13,9 +13,9 @@ Survival Log draws its menus and HUD with an embedded Chromium browser. When tha
 - **Stuck pause release**: a crash can leave the game paused with no window open. After a repair the mod checks the pause. If you paused with the speed control, it is left alone. If the game says an open window holds the pause, it is left alone too. Otherwise the pause is treated as left over from the crash and the game is resumed.
 - **Clicks on the world come back**: clicking an object while the UI was gone could leave every object unclickable afterwards, with no menu to explore, sleep or use anything. After a repair the mod checks whether clicks still reach the world, and looks a second time a moment later before it changes anything, so a menu that is just opening is not mistaken for a stuck one. If the game says an object menu, trap panel or vase panel is open, it is left alone; otherwise clicks are given back. `Ctrl+F12` also closes an object menu, trap panel or vase panel that is holding the clicks.
 - **Manual repair**: `Ctrl+F12` runs the same repair by hand. It releases a stuck pause even when the game thinks a window is still open (the hidden error dialog itself can count as one), but never a pause you set with the speed control.
-- **Keeps other UI mods working**: the game starts its recovered browser without the page-access flags that UI mods rely on. The mod hands those flags back as soon as a crash shows and before each of its own recoveries, so mods that add to the game's pages keep working after a recovery.
+- **Keeps other UI mods working**: the game starts its recovered browser without the page-access flags that UI mods rely on. The mod hands those flags back at the moment the game starts the new browser, so mods that add to the game's pages keep working after a recovery. After each recovery it also checks that the new browser really has them. If not, it restarts the browser once more through the game's own recovery (the UI is gone for a few seconds). It never does that twice in a row, and a second miss only goes in the log.
 - **UI clock check**: once a minute (and 40 seconds after each repair) it compares the clock the UI shows with the game's own time. If they are more than 30 game minutes apart, it asks the game to send the time again; if the UI is still off 3 seconds later, it puts the time on the page itself, and if even that does not take, it logs it and tries again at the next check. It never changes the game's time, only what the UI shows.
-- **Page probe**: `Ctrl+F11` checks whether other UI mods can still reach the game's page and writes the result to the log. It also runs once 75 seconds after the game starts and 10 seconds after each repair. It changes nothing.
+- **Page probe**: `Ctrl+F11` checks whether other UI mods can still reach the game's page and its windows, and writes the result to the log. A window the page cannot read is reported as broken, with the browser's reason. It also runs once 75 seconds after the game starts and 10 seconds after each repair. It changes nothing.
 - **Chromium log**: every Chromium process the game starts and every exit, with its exit code, goes to the log (this can be turned off in the config).
 - **Log file**: everything the mod sees and does is written to `BepInEx\webui-doctor.log`, which survives restarts.
 
@@ -43,6 +43,7 @@ The page probe looks for these UI mods, if you have them: Project Cook, Better T
 - With the backup check (when the hook did not fire), the error dialog can flash up before the repair closes it.
 - The error panel is found by its text in English or Chinese. In another language, a leftover panel may stay until you close it yourself.
 - The UI clock is only checked to within 30 game minutes, because the UI rounds its clock down to 10 minutes.
+- If the browser still comes back without the flags UI mods need after the one extra restart, those mods stay broken until you restart the game. The log says so.
 - `BepInEx\webui-doctor.log` is never trimmed and grows for as long as you play with the mod. Delete it while the game is closed if it gets large.
 
 If the UI does not come back, a pause gets released when it should not, or anything else looks wrong, please tell me (see [Feedback](#feedback-and-bug-reports)).
@@ -70,12 +71,13 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 
 Tested on Survival Log 1.1.18317 with BepInEx `6.0.0-be.788`.
 
-Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.3.7 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.3.8 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
 
 If the error dialog still shows, look in `BepInEx\webui-doctor.log` for "game gave up recovering the UI". If `EnableHardRestart` is off, the line says so.
 
 ## Changelog
 
+- 0.3.8: UI mods, like the cooking mods, keep working after the UI recovers from a crash. The recovered browser used to start without the settings those mods need. The mod now hands them over when the game starts the new browser, checks afterwards, and restarts the browser once more if they are still missing. `Ctrl+F11` now reports that case as broken. It used to say healthy.
 - 0.3.7: After the UI comes back, clicking objects opens their menu again. A click made while the UI was gone could leave every object unclickable, so you could not explore or sleep. The repair after a recovery now fixes that, and so does `Ctrl+F12`.
 
 ## Feedback and bug reports
@@ -92,7 +94,7 @@ dotnet build src/WebUIDoctor -c Release -p:GameDir="C:\path\to\Survival Log"
 
 `GameDir` is the game folder. The default in the project file is a local path you will almost certainly need to override. The output DLL is at `src\WebUIDoctor\bin\Release\WebUIDoctor.dll`.
 
-The unit tests cover the pure rules (retry timing, pause release, world clicks, clock drift, error dialog text, process tree and exit codes) and need nothing from the game:
+The unit tests cover the pure rules (retry timing, pause release, world clicks, clock drift, error dialog text, process tree, exit codes, the browser flag check and the page probe verdict) and need nothing from the game:
 
 ```
 dotnet test tests/WebUIDoctor.Tests

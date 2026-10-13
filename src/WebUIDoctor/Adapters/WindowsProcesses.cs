@@ -36,6 +36,34 @@ internal static class WindowsProcesses
     public static IReadOnlyList<int> ChromiumUnder(int rootPid) =>
         ProcessTree.DescendantsNamed(Snapshot(), rootPid, ChromiumExe);
 
+    /// <summary>The command line of each Chromium process under the game; null for one that can't be opened or read.</summary>
+    public static List<string?> ChromiumCommandLinesUnder(int rootPid)
+    {
+        var commandLines = new List<string?>();
+
+        foreach (var pid in ChromiumUnder(rootPid))
+        {
+            var handle = Win32.OpenProcess(Win32.PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+
+            if (handle == IntPtr.Zero)
+            {
+                commandLines.Add(null);
+                continue;
+            }
+
+            try
+            {
+                commandLines.Add(ReadCommandLine(handle));
+            }
+            finally
+            {
+                Win32.CloseHandle(handle);
+            }
+        }
+
+        return commandLines;
+    }
+
     /// <summary>Reads another process's command line; null when it can't be read.</summary>
     public static string? ReadCommandLine(IntPtr process)
     {
