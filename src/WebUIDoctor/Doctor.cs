@@ -63,7 +63,7 @@ internal sealed class Doctor
         _steps = new (string, Action<WebUILayer, DateTime>)[]
         {
             ("recovery retry", AdvanceRetry),
-            ("paused recovery lift", (_, _) => _timeLift.Tick(_flags.IsRecovering)),
+            ("paused recovery lift", (_, _) => _timeLift.Tick(_flags)),
             ("flag watch", WatchFlags),
             ("repair hotkey", RepairOnHotkey),
             ("repair finish", FinishRepairWhenDue),

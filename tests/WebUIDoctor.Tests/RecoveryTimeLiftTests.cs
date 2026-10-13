@@ -8,55 +8,88 @@ public class RecoveryTimeLiftTests
     private const float Paused = 0.0001f;
     private const float Frame = 1f / 60f;
 
-    /// <summary>Runs frames at whatever scale the lift leaves, the way Unity hands out Time.deltaTime.</summary>
-    private static (LiftState State, float Scale, int Frames) RunWhileRecovering(LiftState state, float scale, int maxFrames)
-    {
-        for (var frame = 1; frame <= maxFrames; frame++)
-        {
-            var step = RecoveryTimeLift.Tick(state, isRecovering: true, scale, Frame * scale);
+    private static LiftInput Recovering(int attempt, float scale, bool isSpeedPaused = true) =>
+        new(IsRecovering: true, attempt, isSpeedPaused, scale, Frame * scale);
 
+    private static LiftInput NotRecovering(float scale, bool isSpeedPaused = true) =>
+        new(IsRecovering: false, Attempt: 0, isSpeedPaused, scale, Frame * scale);
+
+    private static LiftStep LiftFor(int attempt) => RecoveryTimeLift.Tick(LiftState.Initial, Recovering(attempt, Paused));
+
+    /// <summary>
+    /// Feeds frames of one attempt at whatever scale the lift leaves, the way Unity hands out Time.deltaTime. Stops at a
+    /// restore, since a paused game would need hours of frames to reach the target.
+    /// </summary>
+    private static (LiftState State, float Scale) RunAttempt(LiftState state, float scale, int attempt, float gameSeconds)
+    {
+        var elapsed = 0f;
+
+        while (elapsed < gameSeconds)
+        {
+            var step = RecoveryTimeLift.Tick(state, Recovering(attempt, scale));
+
+            elapsed += Frame * scale;
             state = step.Next;
 
             if (step.Action is LiftAction.Lift or LiftAction.Restore) scale = step.Scale;
 
-            if (step.Action == LiftAction.Restore) return (state, scale, frame);
+            if (step.Action == LiftAction.Restore) break;
         }
 
-        return (state, scale, maxFrames);
+        return (state, scale);
     }
 
     [Fact]
-    public void A_recovery_while_paused_gets_a_full_second_of_game_time_then_the_pause_comes_back()
+    public void A_recovery_while_paused_runs_at_normal_speed_through_the_games_waits()
     {
-        // The stuck UI seen in play: paused game, recovery waiting a scaled second that took hours.
-        var start = RecoveryTimeLift.Tick(LiftState.Initial, isRecovering: true, Paused, 0f);
+        // The stuck UI seen in play: paused game, recovery waiting a second of game time that took hours.
+        var start = LiftFor(attempt: 1);
 
         Assert.Equal(LiftAction.Lift, start.Action);
-        Assert.True(start.Scale >= 1f);
+        Assert.Equal(1f, start.Scale);
 
-        var gameTime = 0f;
-        var state = start.Next;
-        var scale = start.Scale;
+        // One second before the browser restart, then up to 30 seconds for the new page.
+        var (state, scale) = RunAttempt(start.Next, start.Scale, attempt: 1, gameSeconds: 31.5f);
 
-        while (state is LiftState.Lifted)
-        {
-            var step = RecoveryTimeLift.Tick(state, isRecovering: true, scale, Frame * scale);
+        Assert.IsType<LiftState.Lifted>(state);
+        Assert.Equal(1f, scale);
+    }
 
-            if (step.Action == LiftAction.None) gameTime += Frame * scale;
+    [Fact]
+    public void The_pause_comes_back_as_soon_as_the_recovery_finishes()
+    {
+        var lifted = RunAttempt(LiftFor(attempt: 1).Next, 1f, attempt: 1, gameSeconds: 2f).State;
+        var step = RecoveryTimeLift.Tick(lifted, NotRecovering(1f));
 
-            state = step.Next;
+        Assert.Equal(LiftAction.Restore, step.Action);
+        Assert.Equal(Paused, step.Scale);
+    }
 
-            if (step.Action == LiftAction.Restore) scale = step.Scale;
-        }
+    [Fact]
+    public void A_second_attempt_started_in_the_same_frame_still_gets_normal_speed()
+    {
+        // The game can fail attempt 1 and start attempt 2 inside one update, so isRecovering never reads false.
+        var (afterFirst, _) = RunAttempt(LiftFor(attempt: 1).Next, 1f, attempt: 1, gameSeconds: 20f);
+        var (afterSecond, scale) = RunAttempt(afterFirst, 1f, attempt: 2, gameSeconds: 31.5f);
 
-        Assert.True(gameTime >= 1f, $"the game's one-second wait needs a second of game time, got {gameTime}");
+        Assert.IsType<LiftState.Lifted>(afterSecond);
+        Assert.Equal(1f, scale);
+    }
+
+    [Fact]
+    public void An_attempt_stuck_past_its_waits_gets_the_pause_back_and_the_next_attempt_is_lifted_again()
+    {
+        var (state, scale) = RunAttempt(LiftFor(attempt: 1).Next, 1f, attempt: 1, gameSeconds: RecoveryTimeLift.MaxLiftPerAttempt + 1f);
+
         Assert.Equal(Paused, scale);
+        Assert.Equal(LiftAction.None, RecoveryTimeLift.Tick(state, Recovering(1, Paused)).Action);
+        Assert.Equal(LiftAction.Lift, RecoveryTimeLift.Tick(state, Recovering(2, Paused)).Action);
     }
 
     [Fact]
     public void A_recovery_at_normal_speed_is_left_alone()
     {
-        var step = RecoveryTimeLift.Tick(LiftState.Initial, isRecovering: true, timeScale: 1f, Frame);
+        var step = RecoveryTimeLift.Tick(LiftState.Initial, Recovering(1, 1f, isSpeedPaused: false));
 
         Assert.Equal(LiftAction.None, step.Action);
     }
@@ -64,46 +97,43 @@ public class RecoveryTimeLiftTests
     [Fact]
     public void A_paused_game_with_no_recovery_is_never_touched()
     {
-        var step = RecoveryTimeLift.Tick(LiftState.Initial, isRecovering: false, Paused, 0f);
+        var step = RecoveryTimeLift.Tick(LiftState.Initial, NotRecovering(Paused));
 
         Assert.Equal(LiftAction.None, step.Action);
     }
 
     [Fact]
-    public void A_speed_change_made_during_the_lift_is_kept()
+    public void The_player_choosing_normal_speed_during_the_lift_is_kept()
     {
-        var lifted = RecoveryTimeLift.Tick(LiftState.Initial, isRecovering: true, Paused, 0f).Next;
-        var step = RecoveryTimeLift.Tick(lifted, isRecovering: true, timeScale: 4f, Frame * 4f);
+        // 1x leaves Unity's scale at 1, the same as the lift; only the game's own speed setting shows the change.
+        var step = RecoveryTimeLift.Tick(LiftFor(attempt: 1).Next, Recovering(1, 1f, isSpeedPaused: false));
 
         Assert.Equal(LiftAction.LeaveSpeedAlone, step.Action);
-
-        var later = RecoveryTimeLift.Tick(step.Next, isRecovering: true, timeScale: 4f, Frame * 4f);
-
-        Assert.Equal(LiftAction.None, later.Action);
+        Assert.Equal(LiftAction.None, RecoveryTimeLift.Tick(step.Next, NotRecovering(1f, isSpeedPaused: false)).Action);
     }
 
     [Fact]
-    public void A_recovery_that_ends_early_puts_the_pause_back_at_once()
+    public void A_faster_speed_chosen_during_the_lift_is_kept()
     {
-        var lifted = RecoveryTimeLift.Tick(LiftState.Initial, isRecovering: true, Paused, 0f).Next;
-        var step = RecoveryTimeLift.Tick(lifted, isRecovering: false, RecoveryTimeLift.LiftedScale, Frame);
+        var step = RecoveryTimeLift.Tick(LiftFor(attempt: 1).Next, Recovering(1, 4f));
 
-        Assert.Equal(LiftAction.Restore, step.Action);
-        Assert.Equal(Paused, step.Scale);
+        Assert.Equal(LiftAction.LeaveSpeedAlone, step.Action);
+        Assert.Equal(LiftAction.None, RecoveryTimeLift.Tick(step.Next, Recovering(1, 4f)).Action);
     }
 
     [Fact]
-    public void One_recovery_is_lifted_once_and_the_next_recovery_is_lifted_again()
+    public void Pausing_again_during_the_recovery_gets_another_lift()
     {
-        var lifted = RecoveryTimeLift.Tick(LiftState.Initial, isRecovering: true, Paused, 0f);
-        var (state, scale, _) = RunWhileRecovering(lifted.Next, lifted.Scale, maxFrames: 600);
+        var afterPlayerResumed = RecoveryTimeLift.Tick(LiftFor(attempt: 1).Next, Recovering(1, 1f, isSpeedPaused: false)).Next;
 
-        Assert.Equal(Paused, scale);
-        Assert.Equal(LiftAction.None, RecoveryTimeLift.Tick(state, isRecovering: true, Paused, 0f).Action);
+        Assert.Equal(LiftAction.Lift, RecoveryTimeLift.Tick(afterPlayerResumed, Recovering(1, Paused)).Action);
+    }
 
-        var ended = RecoveryTimeLift.Tick(state, isRecovering: false, Paused, 0f).Next;
-        var nextRecovery = RecoveryTimeLift.Tick(ended, isRecovering: true, Paused, 0f);
+    [Fact]
+    public void The_next_recovery_after_a_finished_one_is_lifted_again()
+    {
+        var finished = RecoveryTimeLift.Tick(LiftFor(attempt: 1).Next, NotRecovering(1f)).Next;
 
-        Assert.Equal(LiftAction.Lift, nextRecovery.Action);
+        Assert.Equal(LiftAction.Lift, RecoveryTimeLift.Tick(finished, Recovering(1, Paused)).Action);
     }
 }

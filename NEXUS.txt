@@ -10,6 +10,7 @@ Survival Log draws its menus and HUD with a built-in browser. When that browser 
 [*][b]Never gives up[/b]: retries after 3 seconds, then 10 seconds, 30 seconds, 1 minute, then every 2 minutes until the UI is back.[/*]
 [*][b]UI repair[/b]: after every recovery it closes the error dialog and gives mouse clicks back to the UI.[/*]
 [*][b]Stuck pause release[/b]: a pause left over from the crash is resumed. A pause you set with the speed control is never touched.[/*]
+[*][b]Recovery while paused[/b]: the game's recovery waits on game time, which barely moves while paused. The mod runs time at normal speed until the UI is back, then pauses the game again.[/*]
 [*][b]Clicks on the world come back[/b]: if clicking an object while the UI was gone left every object unclickable (no menu to explore or sleep), the repair gives those clicks back.[/*]
 [*][b]Other UI mods keep working[/b]: the recovered browser gets back the settings those mods need, and if they are still missing, the browser is restarted once more.[/*]
 [*][b]UI clock check[/b]: once a minute it makes sure the clock on screen matches the game's time.[/*]
