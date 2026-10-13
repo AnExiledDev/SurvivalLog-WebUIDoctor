@@ -29,6 +29,7 @@ internal sealed class Doctor
     private readonly PageProbe _probe;
     private readonly ClockWatch _clock;
     private readonly ClickWatch _clicks;
+    private readonly TimeLift _timeLift;
     private RetryState _state = RetryState.Initial;
     private WebUILayer? _layer;
     private bool _hasLoggedSettings;
@@ -45,7 +46,7 @@ internal sealed class Doctor
     private readonly HashSet<string> _reportedFaults = new();
     private readonly (string Name, Action<WebUILayer, DateTime> Run)[] _steps;
 
-    public Doctor(DoctorLog log, RetrySettings settings, bool isHardRestartEnabled, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock, ClickWatch clicks)
+    public Doctor(DoctorLog log, RetrySettings settings, bool isHardRestartEnabled, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock, ClickWatch clicks, TimeLift timeLift)
     {
         _log = log;
         _settings = settings;
@@ -56,11 +57,13 @@ internal sealed class Doctor
         _probe = probe;
         _clock = clock;
         _clicks = clicks;
+        _timeLift = timeLift;
 
         // Retry first: it is the step that gets the UI back, so a failure in a diagnostic step must not starve it.
         _steps = new (string, Action<WebUILayer, DateTime>)[]
         {
             ("recovery retry", AdvanceRetry),
+            ("paused recovery lift", (_, _) => _timeLift.Tick(_flags.IsRecovering)),
             ("flag watch", WatchFlags),
             ("repair hotkey", RepairOnHotkey),
             ("repair finish", FinishRepairWhenDue),

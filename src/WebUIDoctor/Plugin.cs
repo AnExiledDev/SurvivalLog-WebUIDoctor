@@ -14,7 +14,7 @@ namespace WebUIDoctor;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.3.8";
+    private const string Version = "0.3.9";
 
     public override void Load()
     {
@@ -35,7 +35,7 @@ public sealed class Plugin : BasePlugin
         var probe = new PageProbe(log.Write);
         var doctor = new Doctor(log, settings, isHardRestartEnabled, gamePid,
             new RepairHotkey(KeyCode.F12, log.Write), new RepairHotkey(KeyCode.F11, log.Write), probe, new ClockWatch(log.Write),
-            new ClickWatch(log.Write));
+            new ClickWatch(log.Write), new TimeLift(log.Write));
 
         log.Write($"===== WebUI Doctor {Version} started, game pid {gamePid}, hardRestart={isHardRestartEnabled} " +
                   $"backoff=[{string.Join(", ", settings.Backoff.Select(wait => $"{wait.TotalSeconds:0}s"))}] forgiveAfter={settings.ForgiveAfter.TotalMinutes:0}min");

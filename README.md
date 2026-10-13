@@ -71,12 +71,13 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 
 Tested on Survival Log 1.1.18317 with BepInEx `6.0.0-be.788`.
 
-Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.3.8 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.3.9 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
 
 If the error dialog still shows, look in `BepInEx\webui-doctor.log` for "game gave up recovering the UI". If `EnableHardRestart` is off, the line says so.
 
 ## Changelog
 
+- 0.3.9: The UI comes back when it breaks while the game is paused. Before, the game's own recovery waited for one second of game time, and a paused game barely moves its clock, so the UI stayed gone until you closed the game. The mod now lets the clock run at normal speed for that second, then pauses the game again.
 - 0.3.8: UI mods, like the cooking mods, keep working after the UI recovers from a crash. The recovered browser used to start without the settings those mods need. The mod now hands them over when the game starts the new browser, checks afterwards, and restarts the browser once more if they are still missing. `Ctrl+F11` now reports that case as broken. It used to say healthy. The mod also no longer cuts short the game's own crash report, which it did on every UI crash.
 - 0.3.7: After the UI comes back, clicking objects opens their menu again. A click made while the UI was gone could leave every object unclickable, so you could not explore or sleep. The repair after a recovery now fixes that, and so does `Ctrl+F12`.
 
