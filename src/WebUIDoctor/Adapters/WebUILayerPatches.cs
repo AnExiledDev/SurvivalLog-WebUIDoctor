@@ -31,8 +31,11 @@ internal static class WebUILayerPatches
         Patch(harmony, "LogInitFailure", prefix: nameof(LogInitFailurePrefix));
         Patch(harmony, "ReportWebUICrashDiagnostic", prefix: nameof(ReportWebUICrashDiagnosticPrefix));
         Patch(harmony, "OnPageFailed", prefix: nameof(OnPageFailedPrefix));
-        Patch(harmony, "ClassifyDiagnosis", postfix: nameof(ClassifyDiagnosisPostfix));
         PatchPageMessages(harmony);
+
+        // Never hook ClassifyDiagnosis: it takes Nullable<bool> by value, which Il2CppInterop's trampoline reads
+        // as a pointer, so every call throws before any patch runs and the game's crash report loses its result.
+        // The game logs the diagnosis itself ("WebUI: ... stage= diag= ...") once that call returns.
     }
 
     /// <summary>Runs first so the probe's own page messages never reach the game or the other mods' hooks.</summary>
@@ -134,11 +137,4 @@ internal static class WebUILayerPatches
 
     private static void OnPageFailedPrefix(string pageId) =>
         Guard("OnPageFailed", () => _log($"game page failed: {pageId}"));
-
-    private static void ClassifyDiagnosisPostfix(
-        string __result, string stage, string childExitCode, string createProcessHr, string faultingModule,
-        bool oomInLog, bool gpuFatal, bool gpuContextLost, bool gpuSkiaOom) =>
-        Guard("ClassifyDiagnosis", () => _log(
-            $"game diagnosis: {__result} | stage={stage} childExit={childExitCode} createProcessHr={createProcessHr} " +
-            $"faultingModule={faultingModule} oomInLog={oomInLog} gpuFatal={gpuFatal} gpuContextLost={gpuContextLost} gpuSkiaOom={gpuSkiaOom}"));
 }

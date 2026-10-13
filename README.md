@@ -77,7 +77,7 @@ If the error dialog still shows, look in `BepInEx\webui-doctor.log` for "game ga
 
 ## Changelog
 
-- 0.3.8: UI mods, like the cooking mods, keep working after the UI recovers from a crash. The recovered browser used to start without the settings those mods need. The mod now hands them over when the game starts the new browser, checks afterwards, and restarts the browser once more if they are still missing. `Ctrl+F11` now reports that case as broken. It used to say healthy.
+- 0.3.8: UI mods, like the cooking mods, keep working after the UI recovers from a crash. The recovered browser used to start without the settings those mods need. The mod now hands them over when the game starts the new browser, checks afterwards, and restarts the browser once more if they are still missing. `Ctrl+F11` now reports that case as broken. It used to say healthy. The mod also no longer cuts short the game's own crash report, which it did on every UI crash.
 - 0.3.7: After the UI comes back, clicking objects opens their menu again. A click made while the UI was gone could leave every object unclickable, so you could not explore or sleep. The repair after a recovery now fixes that, and so does `Ctrl+F12`.
 
 ## Feedback and bug reports
