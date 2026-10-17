@@ -7,14 +7,15 @@ using WebUIDoctor.Core;
 namespace WebUIDoctor.Adapters;
 
 /// <summary>
-/// Compares the clock the CoreUI1 page draws with the game's time once a minute, and puts it right when they
-/// differ: first through the game's own resync, then by posting the time into the page. The same read logs what
+/// Compares the clock the CoreUI1 page draws with the game's time every few seconds, and puts it right when they
+/// differ: first through the game's own resync, then by posting the time into the page. Once only the direct post
+/// works, every check posts the time quietly, so the page clock jumps by seconds, not by an hour. The same read logs what
 /// the page holds for its trap list, since that list lives in the same frame.
 /// All members run on Unity's main thread; the script reply is only stored by its callback.
 /// </summary>
 internal sealed class ClockWatch
 {
-    private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(60);
+    private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan RecheckDelay = TimeSpan.FromSeconds(3);
     private static readonly TimeSpan AnswerWait = TimeSpan.FromSeconds(5);
 
@@ -101,7 +102,8 @@ internal sealed class ClockWatch
         var (action, next) = ClockHeal.Decide(_step, reading.Verdict);
         var gameTime = $"{read.GameSecondOfDay / 3600:00}:{read.GameSecondOfDay / 60 % 60:00}";
 
-        LogReading(reading, gameTime, read.Reply);
+        if (_step != ClockStep.KeepingInStep) LogReading(reading, gameTime, read.Reply);
+
         _step = next;
         Act(action, reading, gameTime, layer, now);
     }
@@ -136,11 +138,15 @@ internal sealed class ClockWatch
                 _log("clock watch: the game's resync did not reach the page; posting the time into the clock frame directly");
                 PostTime(layer);
                 break;
+            case ClockAction.PostSyncQuietly:
+                PostTime(layer);
+                return;
             case ClockAction.ReportGameResyncFixedIt:
                 _log("clock watch: the game's own resync put the page clock right");
                 return;
             case ClockAction.ReportDirectSyncFixedIt:
-                _log("clock watch: the direct post put the page clock right; the game's link to the page clock is broken this launch");
+                _log("clock watch: the direct post put the page clock right; the game's link to the page clock is broken this launch, " +
+                     $"so the time is posted every {CheckInterval.TotalSeconds:0} seconds from now on");
                 return;
             case ClockAction.ReportStillDrifted:
                 _log("clock watch: still drifted after both fixes; will try again next check");
@@ -153,15 +159,21 @@ internal sealed class ClockWatch
         _nextCheckAt = now + RecheckDelay;
     }
 
-    /// <summary>The same message the game sends; maxSeconds is left out so the page keeps its day length.</summary>
+    /// <summary>
+    /// The same messages the game sends; maxSeconds is left out so the page keeps its day length. The pause goes too:
+    /// a page that missed a pause runs its clock on while the game stands still.
+    /// </summary>
     private void PostTime(WebUILayer layer)
     {
         var webView = layer.canvasWebViewPrefab?.WebView;
+        var world = GameSingleton.Existing<BattleLogicWorld>();
 
-        if (webView is null || GameTime() is not { } time) return;
+        if (webView is null || world?._GameTimeManager is not { } time) return;
 
         var seconds = ClockDrift.SecondOfDay(time.GetTotalSeconds());
+        var isPaused = world.IsPause || time.IsPausedScale() ? "true" : "false";
         var script = "(function(){try{" + FindFrame +
+                     $"w.postMessage({{type:'WebUI_CoreUI1_TimeMsg',data:{{isPause:{isPaused}}}}},'*');" +
                      $"w.postMessage({{type:'WebUI_CoreUI1_ClockSyncMsg',data:{{clockTotalSeconds:{seconds}}}}},'*');return 'posted';" +
                      "}catch(e){return 'error: '+e;}})()";
 

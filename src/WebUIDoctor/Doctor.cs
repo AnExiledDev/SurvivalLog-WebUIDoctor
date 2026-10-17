@@ -14,7 +14,7 @@ namespace WebUIDoctor;
 internal sealed class Doctor
 {
     private static readonly TimeSpan AbandonPollInterval = TimeSpan.FromSeconds(1);
-    private static readonly TimeSpan RepairSettleDelay = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan RepairSettleDelay = TimeSpan.FromSeconds(0.5);
     private static readonly TimeSpan BaselineProbeDelay = TimeSpan.FromSeconds(75);
     private static readonly TimeSpan ProbeAfterRepairDelay = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan ClockCheckAfterRepairDelay = TimeSpan.FromSeconds(40);

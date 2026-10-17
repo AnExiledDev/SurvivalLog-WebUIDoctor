@@ -84,20 +84,32 @@ internal static class WebUILayerPatches
         }
     }
 
-    private static void OnUpdatePostfix(WebUILayer __instance) =>
-        Guard("OnUpdate", () =>
+    // The two hooks below run every frame and on every page message, so they skip Guard's closure allocation.
+    private static void OnUpdatePostfix(WebUILayer __instance)
+    {
+        try
         {
             _doctor.SeeLayer(__instance);
             _probe.CountLayerUpdate();
-        });
+        }
+        catch (Exception ex)
+        {
+            _log("OnUpdate hook failed: " + ex.Message);
+        }
+    }
 
     private static bool HandleMessageEmittedPrefix(string serializedMessage)
     {
-        var shouldPassOn = true;
+        try
+        {
+            return _probe.OnPageMessage(serializedMessage);
+        }
+        catch (Exception ex)
+        {
+            _log("HandleMessageEmitted hook failed: " + ex.Message);
 
-        Guard("HandleMessageEmitted", () => shouldPassOn = _probe.OnPageMessage(serializedMessage));
-
-        return shouldPassOn;
+            return true;
+        }
     }
 
     private static bool NotifyRecoverAbandonedPrefix(WebUILayer __instance)

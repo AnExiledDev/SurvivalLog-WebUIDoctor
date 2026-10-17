@@ -40,7 +40,10 @@ internal static class UiRepair
         log(hidden == 0 ? "UI repair: no error dialog left on screen" : $"UI repair: the game's close action left {hidden} dialog panel(s) up; hid them by hand");
         PauseState.Heal(trigger, log);
         clicks.Check(trigger, now);
-        DumpCanvases(layer, log);
+
+        // The canvas list walks every canvas and its texts in one frame, so only a repair asked for by hand pays for it.
+        if (trigger == RepairTrigger.Manual) DumpCanvases(layer, log);
+
         log($"UI repair ({trigger}) done");
     }
 

@@ -14,7 +14,7 @@ namespace WebUIDoctor;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.3.9";
+    private const string Version = "0.4.0";
 
     public override void Load()
     {
@@ -27,11 +27,11 @@ public sealed class Plugin : BasePlugin
         var gamePid = Environment.ProcessId;
         // No give-up: the game's error dialog blocks every click, so retrying is never worse than stopping.
         var settings = new RetrySettings(
-            SettleDelay: TimeSpan.FromSeconds(3),
-            DirectInvokeAfter: TimeSpan.FromSeconds(5),
-            RepairDelay: TimeSpan.FromSeconds(2),
+            SettleDelay: TimeSpan.FromSeconds(1.5),
+            DirectInvokeAfter: TimeSpan.FromSeconds(3),
+            RepairDelay: TimeSpan.FromSeconds(1),
             ForgiveAfter: TimeSpan.FromMinutes(2),
-            Backoff: new[] { TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(2) });
+            Backoff: new[] { TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(1) });
         var probe = new PageProbe(log.Write);
         var doctor = new Doctor(log, settings, isHardRestartEnabled, gamePid,
             new RepairHotkey(KeyCode.F12, log.Write), new RepairHotkey(KeyCode.F11, log.Write), probe, new ClockWatch(log.Write),
