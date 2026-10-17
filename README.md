@@ -51,7 +51,7 @@ If the UI does not come back, a pause gets released when it should not, or anyth
 
 ## Requirements
 
-- Survival Log 1.1.18317. Built and tested on this version; a game update can break it until the mod is updated.
+- Survival Log 1.1.18902. Built and tested on this version; a game update can break it until the mod is updated.
 - The [BepInEx Pack for Survival Log](https://www.nexusmods.com/survivallog/mods/12), the BepInEx 6 (IL2CPP) build for the game.
 - Windows. The mod finds and closes the game's browser processes through Windows itself.
 
@@ -66,13 +66,13 @@ Delete `WebUIDoctor.dll` from the `BepInEx\plugins` folder. For a clean slate, a
 
 ## Configuration
 
-Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created the first time the game starts with the mod. Edit it while the game is closed; changes apply at the next game start. See [CONFIG.md](CONFIG.md) for every setting.
+Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created the first time the game starts with the mod. Edit it while the game is closed; changes apply at the next game start. Each setting in the cfg file is explained in English and Simplified Chinese. See [CONFIG.md](CONFIG.md) for every setting.
 
 ## Troubleshooting
 
-Tested on Survival Log 1.1.18317 with BepInEx `6.0.0-be.788`.
+Tested on Survival Log 1.1.18902 with BepInEx `6.0.0-be.788`.
 
-Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.3.9 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.4.1 started`. It goes on to show the game's process id, whether the hard restart is on, and the retry waits. The same line, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
 
 If the error dialog still shows, look in `BepInEx\webui-doctor.log` for "game gave up recovering the UI". If `EnableHardRestart` is off, the line says so.
 

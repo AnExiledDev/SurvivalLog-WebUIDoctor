@@ -14,14 +14,14 @@ namespace WebUIDoctor;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.4.0";
+    private const string Version = "0.4.1";
 
     public override void Load()
     {
         var isHardRestartEnabled = Config.Bind("Recovery", "EnableHardRestart", true,
-            "When the game gives up recovering its UI, kill its Chromium processes and make it try again instead of showing the error.").Value;
+            "When the game gives up recovering its UI, kill its Chromium processes and make it try again instead of showing the error.\n当游戏放弃恢复界面时，关闭它的 Chromium 进程并让它重试，而不是显示错误。").Value;
         var isExitLoggingEnabled = Config.Bind("Diagnostics", "LogChromiumExits", true,
-            "Log every Chromium process start and exit (with exit code) to BepInEx/webui-doctor.log.").Value;
+            "Log every Chromium process start and exit (with exit code) to BepInEx/webui-doctor.log.\n把每个 Chromium 进程的启动和退出（含退出代码）记录到 BepInEx/webui-doctor.log。").Value;
 
         var log = new DoctorLog(Log, Path.Combine(Paths.BepInExRootPath, "webui-doctor.log"));
         var gamePid = Environment.ProcessId;
