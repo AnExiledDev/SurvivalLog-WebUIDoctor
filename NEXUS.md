@@ -33,9 +33,7 @@ Works in English and Chinese.
 [*]It cannot stop the browser from crashing. The UI is gone for a few seconds (longer after repeated crashes) while it comes back.[/*]
 [*]Ctrl+F12 releases a pause even if the game thinks a window is open. Only a pause you set with the speed control is left alone.[/*]
 [*]The leftover error panel is found by its English or Chinese text. In another language you may have to close it yourself.[/*]
-[*]The log file is never trimmed. Delete it while the game is closed if it gets large.[/*]
 [/list]
-If you run into anything strange, please tell me (see Feedback below).
 
 [size=5]Requirements[/size]
 [list]
@@ -98,9 +96,7 @@ Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、
 [*]它无法阻止浏览器崩溃。界面恢复期间会消失几秒钟（多次崩溃后会更久）。[/*]
 [*]即使游戏认为有窗口打开，Ctrl+F12 也会解除暂停。只有你用速度控制设置的暂停不受影响。[/*]
 [*]残留的错误面板是通过英文或中文文字识别的。使用其他语言时，你可能需要自己关闭它。[/*]
-[*]日志文件不会自动清理。如果它变得很大，请在游戏关闭时删除。[/*]
 [/list]
-如果遇到任何奇怪的情况，请告诉我（见下方反馈）。
 
 [size=5]前置要求[/size]
 [list]

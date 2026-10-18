@@ -45,9 +45,6 @@ The page probe looks for these UI mods, if you have them: Project Cook, Better T
 - The error panel is found by its text in English or Chinese. In another language, a leftover panel may stay until you close it yourself.
 - The UI clock is only checked to within 30 game minutes, because the UI rounds its clock down to 10 minutes.
 - If the browser still comes back without the flags UI mods need after the one extra restart, those mods stay broken until you restart the game. The log says so.
-- `BepInEx\webui-doctor.log` is never trimmed and grows for as long as you play with the mod. Delete it while the game is closed if it gets large.
-
-If the UI does not come back, a pause gets released when it should not, or anything else looks wrong, please tell me (see [Feedback](#feedback-and-bug-reports)).
 
 ## Requirements
 
