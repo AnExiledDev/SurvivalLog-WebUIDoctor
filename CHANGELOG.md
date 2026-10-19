@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Settings changed on the Mod Manager's Mods screen take effect at once.
+- The Mods screen shows the mod's name, description, category and links.
+- Needs Exiled's Toolkit 0.4.0 or newer.
+
 ## 0.4.1
 
 Changes since 0.3.5:

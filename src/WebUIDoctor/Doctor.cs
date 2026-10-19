@@ -22,7 +22,6 @@ internal sealed class Doctor
 
     private readonly DoctorLog _log;
     private readonly RetrySettings _settings;
-    private readonly bool _isHardRestartEnabled;
     private readonly int _gamePid;
     private readonly RepairHotkey _repairHotkey;
     private readonly RepairHotkey _probeHotkey;
@@ -46,11 +45,13 @@ internal sealed class Doctor
     private readonly HashSet<string> _reportedFaults = new();
     private readonly (string Name, Action<WebUILayer, DateTime> Run)[] _steps;
 
-    public Doctor(DoctorLog log, RetrySettings settings, bool isHardRestartEnabled, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock, ClickWatch clicks, TimeLift timeLift)
+    /// <summary>Whether a UI the game gave up on gets its Chromium killed and tried again. Set on the main thread.</summary>
+    public bool IsHardRestartEnabled { get; set; }
+
+    public Doctor(DoctorLog log, RetrySettings settings, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock, ClickWatch clicks, TimeLift timeLift)
     {
         _log = log;
         _settings = settings;
-        _isHardRestartEnabled = isHardRestartEnabled;
         _gamePid = gamePid;
         _repairHotkey = repairHotkey;
         _probeHotkey = probeHotkey;
@@ -172,7 +173,7 @@ internal sealed class Doctor
 
     private bool HandleAbandon(string source, bool canSkipDialog)
     {
-        if (!_isHardRestartEnabled)
+        if (!IsHardRestartEnabled)
         {
             _log.Write($"game gave up recovering the UI ({source}); hard restart is disabled in the config. The error dialog will show.");
 

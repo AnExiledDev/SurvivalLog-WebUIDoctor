@@ -19,6 +19,7 @@ internal sealed class ChildExitWatcher
     private readonly Action<string> _log;
     private readonly Dictionary<int, Tracked> _tracked = new();
     private Thread? _thread;
+    private volatile bool _isOn;
 
     public ChildExitWatcher(int gamePid, TimeSpan interval, Action<string> log)
     {
@@ -27,7 +28,15 @@ internal sealed class ChildExitWatcher
         _log = log;
     }
 
-    public void Start()
+    /// <summary>Starts the watch thread the first time it is turned on. While off, the thread only sleeps.</summary>
+    public void TurnOn(bool isOn)
+    {
+        _isOn = isOn;
+
+        if (isOn && _thread is null) Start();
+    }
+
+    private void Start()
     {
         _thread = new Thread(Run) { IsBackground = true, Name = "WebUIDoctor.ChildExitWatcher" };
         _thread.Start();
@@ -37,17 +46,22 @@ internal sealed class ChildExitWatcher
     {
         while (true)
         {
-            try
-            {
-                TrackNewProcesses();
-                ReportExitedProcesses();
-            }
-            catch (Exception ex)
-            {
-                _log("watcher error: " + ex.Message);
-            }
+            if (_isOn) Watch();
 
             Thread.Sleep(_interval);
+        }
+    }
+
+    private void Watch()
+    {
+        try
+        {
+            TrackNewProcesses();
+            ReportExitedProcesses();
+        }
+        catch (Exception ex)
+        {
+            _log("watcher error: " + ex.Message);
         }
     }
 

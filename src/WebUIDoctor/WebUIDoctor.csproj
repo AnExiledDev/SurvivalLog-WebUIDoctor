@@ -12,6 +12,7 @@
     <GameDir Condition="'$(GameDir)' == ''">D:\Games\Survival Log\Survival Log</GameDir>
     <BepInExCore>$(GameDir)\BepInEx\core</BepInExCore>
     <Interop>$(GameDir)\BepInEx\interop</Interop>
+    <ToolkitDll Condition="'$(ToolkitDll)' == ''">D:\devnew\game-mods\SurvivalLog\mods\sl-exiled-toolkit\src\ExiledToolkit\bin\Release\ExiledToolkit.dll</ToolkitDll>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +31,18 @@
     <Reference Include="$(Interop)\UnityEngine.UI.dll" Private="false" />
     <Reference Include="$(Interop)\Unity.TextMeshPro.dll" Private="false" />
     <Reference Include="$(Interop)\UnityEngine.InputLegacyModule.dll" Private="false" />
+    <Reference Include="$(ToolkitDll)" Private="false" />
+  </ItemGroup>
+
+  <!-- What the Mod Manager's Mods screen shows about this mod. -->
+  <ItemGroup>
+    <AssemblyMetadata Include="ModManager.Name" Value="WebUI Doctor&#10;界面修复" />
+    <AssemblyMetadata Include="ModManager.Description" Value="Gets the UI back when Survival Log shows its &quot;interface display error&quot;. Restarts the game's browser until the UI returns, then closes the error dialog, gives clicks back and releases a stuck pause.&#10;当 Survival Log 显示「界面显示异常」时把界面找回来。不断重启游戏的浏览器直到界面恢复，然后关闭错误对话框、恢复点击，并解除卡住的暂停。" />
+    <AssemblyMetadata Include="ModManager.Author" Value="AnExiledDev" />
+    <AssemblyMetadata Include="ModManager.Category" Value="Tools" />
+    <AssemblyMetadata Include="ModManager.GameVersion" Value="1.1.18902" />
+    <AssemblyMetadata Include="ModManager.Settings" Value="Live" />
+    <AssemblyMetadata Include="ModManager.GitHub" Value="AnExiledDev/SurvivalLog-WebUIDoctor" />
   </ItemGroup>
 
 </Project>
