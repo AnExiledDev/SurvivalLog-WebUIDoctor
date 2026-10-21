@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using BepInEx.Logging;
+using WebUIDoctor.Core;
 
 namespace WebUIDoctor.Adapters;
 
@@ -27,7 +28,8 @@ internal sealed class DoctorLog
 
     public void Write(string message)
     {
-        _bepinex.LogInfo(message);
+        if (HookFailure.Is(message)) _bepinex.LogError(message);
+        else _bepinex.LogInfo(message);
 
         if (_file is null) return;
 

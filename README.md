@@ -73,7 +73,7 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 
 Tested on Survival Log 1.1.18902 with BepInEx `6.0.0-be.788`.
 
-Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.5.0 started`. It goes on to show the game's process id and the retry waits, and the next lines show `hardRestart=` and `logChromiumExits=` (again each time you change them). The same lines, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.5.1 started`. It goes on to show the game's process id and the retry waits, and the next lines show `hardRestart=` and `logChromiumExits=` (again each time you change them). The same lines, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
 
 If the error dialog still shows, look in `BepInEx\webui-doctor.log` for "game gave up recovering the UI". If `EnableHardRestart` is off, the line says so.
 

@@ -40,7 +40,7 @@
     <AssemblyMetadata Include="ModManager.Description" Value="Gets the UI back when Survival Log shows its &quot;interface display error&quot;. Restarts the game's browser until the UI returns, then closes the error dialog, gives clicks back and releases a stuck pause.&#10;当 Survival Log 显示「界面显示异常」时把界面找回来。不断重启游戏的浏览器直到界面恢复，然后关闭错误对话框、恢复点击，并解除卡住的暂停。" />
     <AssemblyMetadata Include="ModManager.Author" Value="AnExiledDev" />
     <AssemblyMetadata Include="ModManager.Category" Value="Tools" />
-    <AssemblyMetadata Include="ModManager.GameVersion" Value="1.1.18902" />
+    <AssemblyMetadata Include="ModManager.GameVersion" Value="1.1.19131" />
     <AssemblyMetadata Include="ModManager.Settings" Value="Restart" />
     <AssemblyMetadata Include="ModManager.GitHub" Value="AnExiledDev/SurvivalLog-WebUIDoctor" />
     <AssemblyMetadata Include="ModManager.Changelog" Value="https://github.com/AnExiledDev/SurvivalLog-WebUIDoctor/blob/main/CHANGELOG.md" />
