@@ -16,14 +16,14 @@ namespace WebUIDoctor;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.6.0";
+    private const string Version = "0.6.1";
 
     public override void Load()
     {
         if (!OptionalLive.IsToolkitInstalled) Log.LogInfo(OptionalLive.MissingNote);
 
         var isHardRestartEnabled = Config.Bind("Recovery", "EnableHardRestart", true,
-            "When the game gives up recovering its UI, kill its Chromium processes and make it try again instead of showing the error.\n当游戏放弃恢复界面时，关闭它的 Chromium 进程并让它重试，而不是显示错误。");
+            "When the game's menus fail to load and the game gives up, restart the browser the menus run in and try again, instead of showing the error.\n当游戏菜单加载失败且游戏放弃恢复时，重启菜单所用的浏览器并重试，而不是显示错误。");
         var isExitLoggingEnabled = Config.Bind("Diagnostics", "LogChromiumExits", true,
             new ConfigDescription("Log every Chromium process start and exit (with exit code) to BepInEx/webui-doctor.log.\n把每个 Chromium 进程的启动和退出（含退出代码）记录到 BepInEx/webui-doctor.log。", null, "ModManager.Advanced"));
         var menuFrameRate = Config.Bind("Display", "MenuFrameRate", WebFrameRate.Default,

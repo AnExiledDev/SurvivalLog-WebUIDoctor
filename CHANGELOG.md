@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1
+
+- Clearer description for the `EnableHardRestart` setting.
+- Made for Survival Log 1.1.20151.
+
 ## 0.6.0
 
 - Menus and the HUD redraw 60 times a second instead of the game's 30, so they feel smooth and answer the mouse sooner. The new `MenuFrameRate` setting (30 to 120) changes this; a change takes effect the next time you start the game.
