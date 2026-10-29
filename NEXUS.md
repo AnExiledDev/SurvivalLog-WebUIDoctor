@@ -14,6 +14,7 @@ Survival Log draws its menus and HUD with a built-in browser. When that browser 
 [*][b]Clicks on the world come back[/b]: if clicking an object while the UI was gone left every object unclickable (no menu to explore or sleep), the repair gives those clicks back.[/*]
 [*][b]Other UI mods keep working[/b]: the recovered browser gets back the settings those mods need, and if they are still missing, the browser is restarted once more.[/*]
 [*][b]UI clock check[/b]: once a minute it makes sure the clock on screen matches the game's time.[/*]
+[*][b]Smoother menus[/b]: menus and the HUD redraw 60 times a second instead of the game's 30, so they answer the mouse sooner. Change it with MenuFrameRate; it takes effect the next time you start the game.[/*]
 [*][b]Log file[/b]: everything it does goes to BepInEx\webui-doctor.log.[/*]
 [/list]
 
@@ -40,7 +41,7 @@ Works in English and Chinese.
 
 [size=5]Requirements[/size]
 [list]
-[*]Survival Log 1.1.19131. A game update can break it until the mod is updated.[/*]
+[*]Survival Log 1.1.19611. A game update can break it until the mod is updated.[/*]
 [*][url=https://www.nexusmods.com/survivallog/mods/12]BepInEx for Survival Log[/url]. Install it first.[/*]
 [*]Optional: [url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.4.0 or newer. With it, settings changed on the Mod Manager's Mods screen take effect without restarting the game. Without it, they take effect at the next game start.[/*]
 [*]Windows.[/*]
@@ -83,6 +84,7 @@ Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、
 [*][b]恢复对场景物体的点击[/b]：如果界面消失时点击了物体，导致所有物体都无法点击（没有探索或睡觉菜单），修复会恢复这些点击。[/*]
 [*][b]其他界面模组继续工作[/b]：恢复后的浏览器会重新获得这些模组需要的设置；如果仍然缺失，会再重启一次浏览器。[/*]
 [*][b]界面时钟检查[/b]：每分钟确认一次屏幕上的时钟与游戏时间一致。[/*]
+[*][b]更流畅的菜单[/b]：菜单和 HUD 每秒重绘 60 次，而不是游戏自带的 30 次，对鼠标的反应更快。可用 MenuFrameRate 修改，下次启动游戏时生效。[/*]
 [*][b]日志文件[/b]：它做的每件事都会写入 BepInEx\webui-doctor.log。[/*]
 [/list]
 
@@ -108,7 +110,7 @@ Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、
 
 [size=5]前置要求[/size]
 [list]
-[*]Survival Log 1.1.19131。游戏更新后模组可能暂时失效，直到模组更新为止。[/*]
+[*]Survival Log 1.1.19611。游戏更新后模组可能暂时失效，直到模组更新为止。[/*]
 [*][url=https://www.nexusmods.com/survivallog/mods/12]BepInEx for Survival Log[/url]，请先安装。[/*]
 [*]可选：[url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.4.0 或更新版本。装了它，在 Mod Manager 的「模组」界面改动的设置无需重启游戏即可生效；没装的话，改动在下次启动游戏时生效。[/*]
 [/list]

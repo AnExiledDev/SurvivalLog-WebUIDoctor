@@ -10,6 +10,14 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 
 With `false`, the mod logs that the game gave up and lets the game's error dialog show. The UI repair after the game's own recoveries, the clock check and both hotkeys keep working. The single browser restart that brings back the settings other UI mods need also still happens, whatever this setting says.
 
+## Display
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `MenuFrameRate` | `60` | How many times a second the menus and HUD redraw, from 30 to 120. The game uses 30. |
+
+The game's browser takes this when it starts, so a change takes effect the next time you start the game, even on the Mods screen. A higher rate makes menus smoother and quicker to answer the mouse, and costs a little more graphics card time while a menu is open.
+
 ## Diagnostics
 
 | Setting | Default | What it does |
