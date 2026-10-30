@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.2
+
+- Ctrl+F12 and Ctrl+F11 no longer go off while you type in a text box, such as a search box in another mod's window. This needs Exiled's Toolkit 0.12.0 or newer.
+- Made for Survival Log 1.1.20151.
+
 ## 0.6.1
 
 - Clearer description for the `EnableHardRestart` setting.

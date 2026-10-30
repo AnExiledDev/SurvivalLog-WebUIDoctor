@@ -1,11 +1,18 @@
 using System;
 using UnityEngine;
+using WebUIDoctor.Core;
 
 namespace WebUIDoctor.Adapters;
 
-/// <summary>A Ctrl+key hotkey. Turns itself off if the game has the legacy input API disabled.</summary>
+/// <summary>
+/// A Ctrl+key hotkey. Turns itself off if the game has the legacy input API disabled. A press while a text box has the
+/// keyboard is typing, not a hotkey.
+/// </summary>
 internal sealed class RepairHotkey
 {
+    private static readonly Func<KeyCode, bool> IsCtrlKeyDown = key => (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(key);
+    private static readonly Func<bool> IsTyping = OptionalLive.IsTyping;
+
     private readonly KeyCode _key;
     private readonly Action<string> _log;
     private bool _isDisabled;
@@ -22,9 +29,7 @@ internal sealed class RepairHotkey
 
         try
         {
-            var isCtrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-
-            return isCtrlHeld && Input.GetKeyDown(_key);
+            return KeyGate.Fires(_key, KeyCode.None, IsCtrlKeyDown, IsTyping);
         }
         catch (Exception ex)
         {
