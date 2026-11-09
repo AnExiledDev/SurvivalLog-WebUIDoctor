@@ -48,7 +48,7 @@ internal sealed class TimeLift
         }
     }
 
-    /// <summary>The game's own speed setting. A lift only changes Unity's time scale, so this still reads paused during one.</summary>
+    /// <summary>The game's speed setting. A lift only changes Unity's time scale, so this still reads paused during one.</summary>
     private static bool IsSpeedPaused() =>
         GameSingleton.Existing<BattleLogicWorld>()?._GameTimeManager?.IsPausedScale() ?? false;
 }

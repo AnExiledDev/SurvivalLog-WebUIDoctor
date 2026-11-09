@@ -21,7 +21,7 @@ public readonly record struct ClickSnapshot(
         $"vasePanelOpen={IsVasePanelOpen} selectFlag={IsSelectMenuFlagged}";
 }
 
-/// <summary>The steps that give clicks on the world back; each one is the game's own way of undoing a panel.</summary>
+/// <summary>The steps that give clicks on the world back; each one is the game's way of undoing a panel.</summary>
 /// <param name="NeedsSecondLook">Nothing is done yet: the same reading has to be seen again a moment later first.</param>
 public readonly record struct ClickRepair(
     bool CloseSelectMenu,

@@ -112,7 +112,7 @@ internal sealed class ClickWatch
             IsOpen(Il2CppType.Of<WebUI_VasePanel>()),
             _camera?.isBattleSelectOpen ?? false);
 
-        /// <summary>Each step uses the game's own call for it; one failing does not stop the next.</summary>
+        /// <summary>Each step uses the game's call for it; one failing does not stop the next.</summary>
         public void Repair(ClickRepair repair, Action<string> log)
         {
             if (repair.CloseSelectMenu) Step("asked the game to close the object menu", Ac_SelectMenu_Close.SendAction, log);

@@ -36,7 +36,7 @@ public enum LiftAction
 
 /// <param name="IsRecovering">The game's isRecovering flag.</param>
 /// <param name="Attempt">The game's recoverAttempts; it goes up at the start of every attempt.</param>
-/// <param name="IsSpeedPaused">The game's own speed setting says paused (GameTimeManager.IsPausedScale), which a lift does not change.</param>
+/// <param name="IsSpeedPaused">The game's speed setting says paused (GameTimeManager.IsPausedScale), which a lift does not change.</param>
 /// <param name="TimeScale">Unity's time scale right now.</param>
 /// <param name="ScaledDelta">Game time that passed this frame (Time.deltaTime), the clock the game's waits count.</param>
 public readonly record struct LiftInput(bool IsRecovering, int Attempt, bool IsSpeedPaused, float TimeScale, float ScaledDelta);
@@ -51,7 +51,7 @@ public static class RecoveryTimeLift
     public const float PausedBelow = 0.01f;
 
     /// <summary>
-    /// The game's own waits in one attempt add up to 31 s of game time (1 s before the restart, 30 s page timeout), and
+    /// The game's waits in one attempt add up to 31 s of game time (1 s before the restart, 30 s page timeout), and
     /// the margin covers the frames around them. Past this the attempt is stuck on something time does not fix, so the
     /// pause goes back rather than letting a paused game run on.
     /// </summary>

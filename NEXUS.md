@@ -2,7 +2,7 @@ Name: WebUI Doctor
 Summary: Gets the UI back when Survival Log shows its "interface display error". It restarts the game's browser and keeps retrying until the UI returns, then closes the error dialog, gives clicks back and releases a stuck pause. Ctrl+F12 repairs the UI by hand. Writes nothing to your save.
 
 Description (BBCode):
-Survival Log draws its menus and HUD with a built-in browser. When that browser crashes and the game's own recovery gives up, you are left with an error dialog and a dead UI. WebUI Doctor restarts the browser, keeps trying until the UI is back, and cleans up after the crash.
+Survival Log draws its menus and HUD with a built-in browser. When that browser crashes and the game's recovery gives up, you are left with an error dialog and a dead UI. WebUI Doctor restarts the browser, keeps trying until the UI is back, and cleans up after the crash.
 
 [size=5]Main features[/size]
 [list]
@@ -25,7 +25,7 @@ Survival Log draws its menus and HUD with a built-in browser. When that browser 
 [/list]
 These keys are fixed and cannot be changed.
 
-The mod writes nothing into your save. It only restarts the game's own browser and resumes a pause it judges stuck. You can remove it at any time; the game then shows its error dialog again when its recovery gives up.
+The mod writes nothing into your save. It only restarts the game's browser and resumes a pause it judges stuck. You can remove it at any time; the game then shows its error dialog again when its recovery gives up.
 
 Works in English and Chinese.
 

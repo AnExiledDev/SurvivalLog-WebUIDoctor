@@ -14,7 +14,7 @@ public enum FlagCheckOutcome
     /// <summary>The UI is down or recovering again: that recovery gets its own check when it ends.</summary>
     RecoveryUnderWay,
 
-    /// <summary>The flags are missing: restart the browser once through the game's own recovery, which hands them over.</summary>
+    /// <summary>The flags are missing: restart the browser once through the game's recovery, which hands them over.</summary>
     RestartBrowser,
 
     /// <summary>The flags are still missing after the one restart: leave the UI up rather than restart it again.</summary>

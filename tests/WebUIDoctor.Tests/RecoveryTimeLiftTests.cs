@@ -105,7 +105,7 @@ public class RecoveryTimeLiftTests
     [Fact]
     public void The_player_choosing_normal_speed_during_the_lift_is_kept()
     {
-        // 1x leaves Unity's scale at 1, the same as the lift; only the game's own speed setting shows the change.
+        // 1x leaves Unity's scale at 1, the same as the lift; only the game's speed setting shows the change.
         var step = RecoveryTimeLift.Tick(LiftFor(attempt: 1).Next, Recovering(1, 1f, isSpeedPaused: false));
 
         Assert.Equal(LiftAction.LeaveSpeedAlone, step.Action);

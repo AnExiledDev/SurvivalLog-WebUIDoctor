@@ -8,7 +8,7 @@ namespace WebUIDoctor.Adapters;
 
 /// <summary>
 /// Compares the clock the CoreUI1 page draws with the game's time every few seconds, and puts it right when they
-/// differ: first through the game's own resync, then by posting the time into the page. Once only the direct post
+/// differ: first through the game's resync, then by posting the time into the page. Once only the direct post
 /// works, every check posts the time quietly, so the page clock jumps by seconds, not by an hour. The same read logs what
 /// the page holds for its trap list, since that list lives in the same frame.
 /// All members run on Unity's main thread; the script reply is only stored by its callback.
@@ -142,7 +142,7 @@ internal sealed class ClockWatch
                 PostTime(layer);
                 return;
             case ClockAction.ReportGameResyncFixedIt:
-                _log("clock watch: the game's own resync put the page clock right");
+                _log("clock watch: the game's resync put the page clock right");
                 return;
             case ClockAction.ReportDirectSyncFixedIt:
                 _log("clock watch: the direct post put the page clock right; the game's link to the page clock is broken this launch, " +

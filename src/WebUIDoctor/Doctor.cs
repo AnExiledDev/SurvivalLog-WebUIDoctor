@@ -101,7 +101,7 @@ internal sealed class Doctor
     }
 
     /// <summary>
-    /// RecoverWebView prefix. Fires only for our own direct call: the game's own recoveries never reach it
+    /// RecoverWebView prefix. Fires only for our own direct call: the game's recoveries never reach it
     /// (every "game recovery starting" line in the log follows "calling RecoverWebView directly").
     /// </summary>
     public void OnOurRecoveryStarted(WebUILayer layer)
@@ -205,7 +205,7 @@ internal sealed class Doctor
 
     /// <summary>
     /// Fallback for when the NotifyRecoverAbandoned hook never fires (a small private method can be inlined
-    /// away from Harmony). Watches the game's own flag instead; the dialog may already be showing then,
+    /// away from Harmony). Watches the game's flag instead; the dialog may already be showing then,
     /// and the repair after recovery closes it.
     /// </summary>
     private void PollAbandonFlag(DateTime now)
@@ -337,7 +337,7 @@ internal sealed class Doctor
 
     /// <summary>
     /// A moment after each recovery, reads the relaunched browser's command line. Without the page-access flags every
-    /// page mod is cut off, so the browser gets one restart through the game's own recovery, which passes the
+    /// page mod is cut off, so the browser gets one restart through the game's recovery, which passes the
     /// StartChromiumPipeWatchdog hook that hands the flags over.
     /// </summary>
     private void CheckBrowserFlagsWhenDue(WebUILayer layer, DateTime now)

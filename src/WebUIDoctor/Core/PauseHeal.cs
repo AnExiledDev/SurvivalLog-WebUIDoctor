@@ -56,7 +56,7 @@ public static class PauseHeal
         if (snapshot.IsSpeedPaused) return PauseVerdict.PausedByPlayer;
 
         // Ctrl+F12 is only pressed when the player is stuck, and the hidden error dialog itself can count as an open window.
-        // A window that holds no pause is the crashed UI's leftover: the game's own deadlock check reads holds=0 that way.
+        // A window that holds no pause is the crashed UI's leftover: the game's deadlock check reads holds=0 that way.
         var isWindowHoldingPause = snapshot.IsInLegitPauseModal && snapshot.UserUiPauseHolds > 0;
 
         if (isWindowHoldingPause && trigger == RepairTrigger.AfterRecovery) return PauseVerdict.PausedByOpenWindow;

@@ -18,7 +18,7 @@ public enum ClockAction
     /// <summary>Ask the game to send its time to the page, the same way its 30-second resync does.</summary>
     AskGameToResync,
 
-    /// <summary>The game's own resync did not land, so post the time into the clock's frame ourselves.</summary>
+    /// <summary>The game's resync did not land, so post the time into the clock's frame ourselves.</summary>
     PostSyncDirectly,
 
     /// <summary>The game's link to the page clock is broken; post the time again without logging it.</summary>
@@ -30,7 +30,7 @@ public enum ClockAction
 }
 
 /// <summary>
-/// Decides the next fix for a drifted page clock. The game's own resync goes first: if it lands, the drift was
+/// Decides the next fix for a drifted page clock. The game's resync goes first: if it lands, the drift was
 /// a missed message; if only the direct post lands, the game's link to the page is broken, and from then on every
 /// check posts the time, so the page clock never runs far on its own.
 /// </summary>

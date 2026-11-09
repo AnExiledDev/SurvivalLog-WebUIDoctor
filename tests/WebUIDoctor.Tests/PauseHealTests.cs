@@ -41,7 +41,7 @@ public class PauseHealTests
     [Fact]
     public void After_an_automatic_repair_an_open_window_that_holds_no_pause_is_stuck()
     {
-        // 2026-10-11 01:58:24: world, camera and render all held, legitModal=True, uiPauseHolds=0. The game's own
+        // 2026-10-11 01:58:24: world, camera and render all held, legitModal=True, uiPauseHolds=0. The game's
         // sleep-deadlock diagnostic reads holds=0 with a paused world as a real deadlock.
         var orphanedModal = LeftoverPause with { IsInLegitPauseModal = true, UserUiPauseHolds = 0 };
 

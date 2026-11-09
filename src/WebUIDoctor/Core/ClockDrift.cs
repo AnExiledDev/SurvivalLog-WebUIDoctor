@@ -19,7 +19,7 @@ public enum ClockVerdict
 public readonly record struct ClockReading(ClockVerdict Verdict, int DriftMinutes, string PageTime, string TrapDetail);
 
 /// <summary>
-/// Compares the clock the CoreUI1 page draws with the game's own time. The page runs its own clock between
+/// Compares the clock the CoreUI1 page draws with the game's time. The page runs its own clock between
 /// the game's resyncs (every 30 seconds), so a page that stops receiving them keeps whatever offset it had,
 /// for the rest of the launch: the day then seems to end at 3am when the game ends it at midnight.
 /// </summary>

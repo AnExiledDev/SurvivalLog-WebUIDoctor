@@ -29,7 +29,7 @@ internal static class UiRepair
     }
 
     /// <summary>
-    /// Hides the error screen only if the game's own close left it up (hiding it bypasses the game's bookkeeping,
+    /// Hides the error screen only if the game's close left it up (hiding it bypasses the game's bookkeeping,
     /// which is how 0.2.1 left the world paused), then releases any pause the crash left behind and checks whether a
     /// panel that never appeared took the clicks on the world.
     /// </summary>
@@ -47,7 +47,7 @@ internal static class UiRepair
         log($"UI repair ({trigger}) done");
     }
 
-    /// <summary>The give-up opens the game's own UI_WebInitFailure screen through a Redux action; its close action is the clean way out.</summary>
+    /// <summary>The give-up opens the game's UI_WebInitFailure screen through a Redux action; its close action is the clean way out.</summary>
     private static void CloseViaGameAction(Action<string> log)
     {
         try

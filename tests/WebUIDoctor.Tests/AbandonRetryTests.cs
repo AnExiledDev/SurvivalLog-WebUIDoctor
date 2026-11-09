@@ -178,7 +178,7 @@ public class AbandonRetryTests
     [Fact]
     public void A_recovery_the_game_finishes_on_its_own_gets_the_same_ui_repair_as_ours()
     {
-        // The game's own recoveries never reach the RecoverWebView hook, so the flags are the only way to see them.
+        // The game's recoveries never reach the RecoverWebView hook, so the flags are the only way to see them.
         var (startAction, recovering) = AbandonRetry.Tick(RetryState.Initial, T0, Recovering, Settings);
         var (endAction, next) = AbandonRetry.Tick(recovering, T0.AddSeconds(20), Calm, Settings);
 

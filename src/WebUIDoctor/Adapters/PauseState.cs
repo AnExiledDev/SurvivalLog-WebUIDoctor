@@ -41,7 +41,7 @@ internal static class PauseState
         world.IsInLegitPauseModal(),
         world._userUIPauseHolds);
 
-    /// <summary>Each step uses the game's own call for it; one failing does not stop the next.</summary>
+    /// <summary>Each step uses the game's call for it; one failing does not stop the next.</summary>
     private static void Resume(BattleLogicWorld world, CameraManager camera, PauseSnapshot before, Action<string> log)
     {
         Step("dropped the leftover window pause holds", world.ResetUserUIPauseHolds, log);
