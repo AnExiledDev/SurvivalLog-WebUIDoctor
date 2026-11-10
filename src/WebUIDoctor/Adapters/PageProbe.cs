@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Unity.IL2CPP;
+using ExiledToolkit.Web;
 using GameCore.HotUpdate.ReduxUI;
 using Il2CppInterop.Runtime;
 using UnityEngine;
@@ -89,8 +90,7 @@ internal sealed class PageProbe
         }
 
         var id = $"p{++_probeCount}";
-        var webView = layer.canvasWebViewPrefab?.WebView;
-        var layerWebView = webView?.TryCast<BaseWebView>();
+        var layerWebView = layer.canvasWebViewPrefab?.WebView?.TryCast<BaseWebView>();
         var isLayerWebViewLive = layerWebView != null && layerWebView.IsInitialized && !layerWebView.IsDisposed;
         var otherLive = LogWebViews(id, reason, layerWebView);
 
@@ -98,18 +98,11 @@ internal sealed class PageProbe
         _pending = new PendingProbe(
             id, reason, now + AnswerWait, isLayerWebViewLive, Math.Max(0, otherLive - _baselineOtherWebViews.Value), LoadedModGlobals());
 
-        if (webView is null) return;
-
         var probe = _pending;
 
-        try
-        {
-            webView.ExecuteJavaScript(ProbeScript(id), (Action<string>)(result => probe.ScriptReply = result ?? ""));
-        }
-        catch (Exception ex)
-        {
-            _log($"page link probe {id}: ExecuteJavaScript threw: {ex.Message}");
-        }
+        WebUi.TryRun(ProbeScript(id), (Action<string>)(result => probe.ScriptReply = result ?? ""), out var failure);
+
+        if (failure is not null) _log($"page link probe {id}: ExecuteJavaScript threw: {failure.Message}");
     }
 
     public void FinishWhenDue(DateTime now)

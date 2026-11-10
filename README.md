@@ -49,10 +49,10 @@ The page probe looks for these UI mods, if you have them: Project Cook, Better T
 
 ## Requirements
 
-- Survival Log 1.1.19611. Built and tested on this version; a game update can break it until the mod is updated.
+- Survival Log 1.1.20719. Built and tested on this version; a game update can break it until the mod is updated.
 - The [BepInEx Pack for Survival Log](https://www.nexusmods.com/survivallog/mods/12), the BepInEx 6 (IL2CPP) build for the game.
 - Windows. The mod finds and closes the game's browser processes through Windows itself.
-- [Exiled's Toolkit](https://github.com/AnExiledDev/SurvivalLog-ExiledToolkit) 0.19.0 or newer. WebUI Doctor does not load without it. It applies settings changed on the Mod Manager's Mods screen without restarting the game, and keeps `Ctrl+F12` and `Ctrl+F11` quiet while you type in a text box.
+- [Exiled's Toolkit](https://github.com/AnExiledDev/SurvivalLog-ExiledToolkit) 0.20.0 or newer. WebUI Doctor does not load without it. It applies settings changed on the Mod Manager's Mods screen without restarting the game, and keeps `Ctrl+F12` and `Ctrl+F11` quiet while you type in a text box.
 
 ## Install
 
@@ -72,9 +72,9 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 
 ## Troubleshooting
 
-Tested on Survival Log 1.1.19611 with BepInEx `6.0.0-be.788`.
+Tested on Survival Log 1.1.20719 with BepInEx `6.0.0-be.788`.
 
-Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.6.3 started`. It goes on to show the game's process id and the retry waits, and the next lines show `hardRestart=` and `logChromiumExits=` (again each time you change them). When the game starts its browser, a `menu frame rate` line shows the rate the menus run at. The same lines, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for a line starting `===== WebUI Doctor 0.6.4 started`. It goes on to show the game's process id and the retry waits, and the next lines show `hardRestart=` and `logChromiumExits=` (again each time you change them). When the game starts its browser, a `menu frame rate` line shows the rate the menus run at. The same lines, plus everything the mod does after it (browser starts and exits, recoveries, repairs, pause checks, click checks, clock checks and page probes), is in `BepInEx\webui-doctor.log`, which survives restarts.
 
 If the error dialog still shows, look in `BepInEx\webui-doctor.log` for "game gave up recovering the UI". If `EnableHardRestart` is off, the line says so.
 

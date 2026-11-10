@@ -1,8 +1,8 @@
 using System;
 using ExiledToolkit.Game;
+using ExiledToolkit.Web;
 using GameCore.HotUpdate;
 using GameCore.HotUpdate.Battle.Logic;
-using GameCore.HotUpdate.ReduxUI;
 using WebUIDoctor.Core;
 
 namespace WebUIDoctor.Adapters;
@@ -57,41 +57,37 @@ internal sealed class ClockWatch
         if (at < _nextCheckAt) _nextCheckAt = at;
     }
 
-    public void Tick(WebUILayer layer, DateTime now)
+    public void Tick(DateTime now)
     {
         if (_pending is not null)
         {
-            FinishWhenAnswered(layer, now);
+            FinishWhenAnswered(now);
 
             return;
         }
 
-        if (now >= _nextCheckAt) StartRead(layer, now);
+        if (now >= _nextCheckAt) StartRead(now);
     }
 
-    private void StartRead(WebUILayer layer, DateTime now)
+    private void StartRead(DateTime now)
     {
         _nextCheckAt = now + CheckInterval;
 
-        var webView = layer.canvasWebViewPrefab?.WebView;
-
-        if (webView is null || GameTime() is not { } time) return;
+        if (GameTime() is not { } time) return;
 
         var read = new PendingRead(now + AnswerWait, ClockDrift.SecondOfDay(time.GetTotalSeconds()));
-        _pending = read;
 
-        try
+        if (WebUi.TryRun(ReadScript, (Action<string>)(result => read.Reply = result ?? ""), out var failure))
         {
-            webView.ExecuteJavaScript(ReadScript, (Action<string>)(result => read.Reply = result ?? ""));
+            _pending = read;
+
+            return;
         }
-        catch (Exception ex)
-        {
-            _pending = null;
-            _log("clock watch: ExecuteJavaScript threw: " + ex.Message);
-        }
+
+        if (failure is not null) _log("clock watch: ExecuteJavaScript threw: " + failure.Message);
     }
 
-    private void FinishWhenAnswered(WebUILayer layer, DateTime now)
+    private void FinishWhenAnswered(DateTime now)
     {
         var read = _pending!;
 
@@ -106,7 +102,7 @@ internal sealed class ClockWatch
         if (_step != ClockStep.KeepingInStep) LogReading(reading, gameTime, read.Reply);
 
         _step = next;
-        Act(action, reading, gameTime, layer, now);
+        Act(action, reading, gameTime, now);
     }
 
     private void LogReading(ClockReading reading, string gameTime, string? reply)
@@ -125,7 +121,7 @@ internal sealed class ClockWatch
         _log("clock watch: page trap list " + reading.TrapDetail);
     }
 
-    private void Act(ClockAction action, ClockReading reading, string gameTime, WebUILayer layer, DateTime now)
+    private void Act(ClockAction action, ClockReading reading, string gameTime, DateTime now)
     {
         switch (action)
         {
@@ -137,10 +133,10 @@ internal sealed class ClockWatch
                 break;
             case ClockAction.PostSyncDirectly:
                 _log("clock watch: the game's resync did not reach the page; posting the time into the clock frame directly");
-                PostTime(layer);
+                PostTime();
                 break;
             case ClockAction.PostSyncQuietly:
-                PostTime(layer);
+                PostTime();
                 return;
             case ClockAction.ReportGameResyncFixedIt:
                 _log("clock watch: the game's resync put the page clock right");
@@ -164,12 +160,11 @@ internal sealed class ClockWatch
     /// The same messages the game sends; maxSeconds is left out so the page keeps its day length. The pause goes too:
     /// a page that missed a pause runs its clock on while the game stands still.
     /// </summary>
-    private void PostTime(WebUILayer layer)
+    private void PostTime()
     {
-        var webView = layer.canvasWebViewPrefab?.WebView;
         var world = GameSingleton.Existing<BattleLogicWorld>();
 
-        if (webView is null || world?._GameTimeManager is not { } time) return;
+        if (world?._GameTimeManager is not { } time) return;
 
         var seconds = ClockDrift.SecondOfDay(time.GetTotalSeconds());
         var isPaused = world.IsPause || time.IsPausedScale() ? "true" : "false";
@@ -178,10 +173,14 @@ internal sealed class ClockWatch
                      $"w.postMessage({{type:'WebUI_CoreUI1_ClockSyncMsg',data:{{clockTotalSeconds:{seconds}}}}},'*');return 'posted';" +
                      "}catch(e){return 'error: '+e;}})()";
 
-        webView.ExecuteJavaScript(script, (Action<string>)(result =>
+        var onResult = (Action<string>)(result =>
         {
             if (result != "posted") _log("clock watch: direct post failed: " + result);
-        }));
+        });
+
+        WebUi.TryRun(script, onResult, out var failure);
+
+        if (failure is not null) _log("clock watch: ExecuteJavaScript threw: " + failure.Message);
     }
 
     private static GameTimeManager? GameTime() => GameSingleton.Existing<BattleLogicWorld>()?._GameTimeManager;

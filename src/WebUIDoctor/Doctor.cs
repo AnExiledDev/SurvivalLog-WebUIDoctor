@@ -71,7 +71,7 @@ internal sealed class Doctor
             ("repair finish", FinishRepairWhenDue),
             ("browser flag check", CheckBrowserFlagsWhenDue),
             ("page probe", ProbePageLink),
-            ("clock watch", (layer, now) => _clock.Tick(layer, now)),
+            ("clock watch", (_, now) => _clock.Tick(now)),
             ("click second look", (_, now) => _clicks.Tick(now)),
         };
     }

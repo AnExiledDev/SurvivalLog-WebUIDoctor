@@ -17,7 +17,7 @@ internal static class WebUILayerPatches
     private static PageProbe _probe = null!;
     private static Action<string> _log = _ => { };
 
-    public static void Apply(Harmony harmony, PatchKit hooks, Doctor doctor, PageProbe probe, Action<string> log)
+    public static void Apply(PatchKit hooks, Doctor doctor, PageProbe probe, Action<string> log)
     {
         _doctor = doctor;
         _probe = probe;
@@ -32,7 +32,7 @@ internal static class WebUILayerPatches
         Patch(hooks, "LogInitFailure", prefix: nameof(LogInitFailurePrefix));
         Patch(hooks, "ReportWebUICrashDiagnostic", prefix: nameof(ReportWebUICrashDiagnosticPrefix));
         Patch(hooks, "OnPageFailed", prefix: nameof(OnPageFailedPrefix));
-        PatchPageMessages(harmony);
+        PatchPageMessages(hooks);
 
         // Never hook ClassifyDiagnosis: it takes Nullable<bool> by value, which Il2CppInterop's trampoline reads
         // as a pointer, so every call throws before any patch runs and the game's crash report loses its result.
@@ -40,25 +40,13 @@ internal static class WebUILayerPatches
     }
 
     /// <summary>
-    /// Runs first so the probe's own page messages never reach the game or the other mods' hooks. Placed by hand rather
-    /// than through the Toolkit's page inbox, because it must run before every other hook and it also counts the other
+    /// Runs first so the probe's own page messages never reach the game or the other mods' hooks. A hook of its own
+    /// rather than the Toolkit's page inbox, because it must run before every other hook and it also counts the other
     /// mods' messages that pass by during a probe.
     /// </summary>
-    private static void PatchPageMessages(Harmony harmony)
-    {
-        try
-        {
-            var original = AccessTools.Method(typeof(BaseWebView), "HandleMessageEmitted") ??
-                           throw new MissingMethodException(nameof(BaseWebView), "HandleMessageEmitted");
-
-            harmony.Patch(original, prefix: new HarmonyMethod(typeof(WebUILayerPatches), nameof(HandleMessageEmittedPrefix)) { priority = Priority.First });
-            _log("hooked BaseWebView.HandleMessageEmitted");
-        }
-        catch (Exception ex)
-        {
-            _log($"{HookFailure.Prefix} BaseWebView.HandleMessageEmitted: {ex.Message}");
-        }
-    }
+    private static void PatchPageMessages(PatchKit hooks) =>
+        hooks.Patch(typeof(WebUILayerPatches), typeof(BaseWebView), "HandleMessageEmitted", null, Priority.First,
+            prefix: nameof(HandleMessageEmittedPrefix), done: "hooked BaseWebView.HandleMessageEmitted");
 
     private static void Patch(PatchKit hooks, string target, string? prefix = null, string? postfix = null) =>
         hooks.Patch(typeof(WebUILayerPatches), typeof(WebUILayer), target, prefix: prefix, postfix: postfix, done: $"hooked WebUILayer.{target}");

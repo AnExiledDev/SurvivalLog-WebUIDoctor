@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.4
+
+- If the game crashes, `BepInEx\webui-doctor.log` now keeps the last lines from before the crash.
+- Now needs Exiled's Toolkit 0.20.0 or newer.
+- Made for Survival Log 1.1.20719.
+
 ## 0.6.3
 
 - Now uses Exiled's Toolkit for its shared parts, so it needs Exiled's Toolkit 0.19.0 or newer.

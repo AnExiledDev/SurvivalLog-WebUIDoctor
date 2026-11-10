@@ -41,9 +41,9 @@ Works in English and Chinese.
 
 [size=5]Requirements[/size]
 [list]
-[*]Survival Log 1.1.19611. A game update can break it until the mod is updated.[/*]
+[*]Survival Log 1.1.20719. A game update can break it until the mod is updated.[/*]
 [*][url=https://www.nexusmods.com/survivallog/mods/12]BepInEx for Survival Log[/url]. Install it first.[/*]
-[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.19.0 or newer. WebUI Doctor does not load without it. It applies settings changed on the Mod Manager's Mods screen without restarting the game, and keeps Ctrl+F12 and Ctrl+F11 quiet while you type in a text box.[/*]
+[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.20.0 or newer. WebUI Doctor does not load without it. It applies settings changed on the Mod Manager's Mods screen without restarting the game, and keeps Ctrl+F12 and Ctrl+F11 quiet while you type in a text box.[/*]
 [*]Windows.[/*]
 [/list]
 
@@ -110,9 +110,9 @@ Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、
 
 [size=5]前置要求[/size]
 [list]
-[*]Survival Log 1.1.19611。游戏更新后模组可能暂时失效，直到模组更新为止。[/*]
+[*]Survival Log 1.1.20719。游戏更新后模组可能暂时失效，直到模组更新为止。[/*]
 [*][url=https://www.nexusmods.com/survivallog/mods/12]BepInEx for Survival Log[/url]，请先安装。[/*]
-[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.19.0 或更新版本。没有它，WebUI Doctor 无法加载。它让在 Mod Manager 的「模组」界面改动的设置无需重启游戏即可生效，并且在文本框里打字时 Ctrl+F12 和 Ctrl+F11 不会起作用。[/*]
+[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.20.0 或更新版本。没有它，WebUI Doctor 无法加载。它让在 Mod Manager 的「模组」界面改动的设置无需重启游戏即可生效，并且在文本框里打字时 Ctrl+F12 和 Ctrl+F11 不会起作用。[/*]
 [/list]
 
 [size=5]安装[/size]

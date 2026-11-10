@@ -14,11 +14,11 @@ using WebUIDoctor.Core;
 namespace WebUIDoctor;
 
 [BepInPlugin(Guid, "WebUI Doctor", Version)]
-[BepInDependency(ToolkitGuid, ">=0.19.0")]
+[BepInDependency(ToolkitGuid, ">=0.20.0")]
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.6.3";
+    private const string Version = "0.6.4";
     private const string ToolkitGuid = "com.dev.survivallog.exiledtoolkit";
 
     public override void Load()
@@ -31,7 +31,7 @@ public sealed class Plugin : BasePlugin
             new ConfigDescription("How many times a second the menus and HUD redraw. The game uses 30, which makes menus feel slow to answer the mouse; 60 makes them smooth. Takes effect the next time you start the game.\n菜单和 HUD 每秒重绘的次数。游戏自带 30，菜单对鼠标反应会显得迟钝；60 会流畅很多。下次启动游戏时生效。",
                 new AcceptableValueRange<int>(WebFrameRate.Min, WebFrameRate.Max)));
 
-        var log = new ModLog(Log, "webui-doctor.log") { MaxFileBytes = 1024 * 1024 };
+        var log = new ModLog(Log, "webui-doctor.log") { MaxFileBytes = 1024 * 1024, WritesAtOnce = true };
         var gamePid = Environment.ProcessId;
         // No give-up: the game's error dialog blocks every click, so retrying is never worse than stopping.
         var settings = new RetrySettings(
@@ -51,7 +51,7 @@ public sealed class Plugin : BasePlugin
                   $"backoff=[{string.Join(", ", settings.Backoff.Select(wait => $"{wait.TotalSeconds:0}s"))}] forgiveAfter={settings.ForgiveAfter.TotalMinutes:0}min");
         var harmony = new Harmony(Guid);
         var hooks = new PatchKit(harmony, log.Write);
-        WebUILayerPatches.Apply(harmony, hooks, doctor, probe, log.Write);
+        WebUILayerPatches.Apply(hooks, doctor, probe, log.Write);
         WebFrameRatePatch.Apply(hooks, menuFrameRate, log.Write);
         DoctorTicker.Tick = doctor.Tick;
         DoctorTicker.Log = log.Write;
