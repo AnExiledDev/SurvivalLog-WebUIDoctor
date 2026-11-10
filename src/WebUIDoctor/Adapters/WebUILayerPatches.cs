@@ -1,4 +1,5 @@
 using System;
+using ExiledToolkit.Game;
 using GameCore.HotUpdate.ReduxUI;
 using HarmonyLib;
 using Vuplex.WebView;
@@ -16,21 +17,21 @@ internal static class WebUILayerPatches
     private static PageProbe _probe = null!;
     private static Action<string> _log = _ => { };
 
-    public static void Apply(Harmony harmony, Doctor doctor, PageProbe probe, Action<string> log)
+    public static void Apply(Harmony harmony, PatchKit hooks, Doctor doctor, PageProbe probe, Action<string> log)
     {
         _doctor = doctor;
         _probe = probe;
         _log = log;
 
-        Patch(harmony, "OnUpdate", postfix: nameof(OnUpdatePostfix));
-        Patch(harmony, "NotifyRecoverAbandoned", prefix: nameof(NotifyRecoverAbandonedPrefix));
-        Patch(harmony, "RecoverWebView", prefix: nameof(RecoverWebViewPrefix));
-        Patch(harmony, "StartChromiumPipeWatchdog", prefix: nameof(StartChromiumPipeWatchdogPrefix));
-        Patch(harmony, "OnWebViewTerminated", prefix: nameof(OnWebViewTerminatedPrefix));
-        Patch(harmony, "OnBrowserProcessFailed", prefix: nameof(OnBrowserProcessFailedPrefix));
-        Patch(harmony, "LogInitFailure", prefix: nameof(LogInitFailurePrefix));
-        Patch(harmony, "ReportWebUICrashDiagnostic", prefix: nameof(ReportWebUICrashDiagnosticPrefix));
-        Patch(harmony, "OnPageFailed", prefix: nameof(OnPageFailedPrefix));
+        Patch(hooks, "OnUpdate", postfix: nameof(OnUpdatePostfix));
+        Patch(hooks, "NotifyRecoverAbandoned", prefix: nameof(NotifyRecoverAbandonedPrefix));
+        Patch(hooks, "RecoverWebView", prefix: nameof(RecoverWebViewPrefix));
+        Patch(hooks, "StartChromiumPipeWatchdog", prefix: nameof(StartChromiumPipeWatchdogPrefix));
+        Patch(hooks, "OnWebViewTerminated", prefix: nameof(OnWebViewTerminatedPrefix));
+        Patch(hooks, "OnBrowserProcessFailed", prefix: nameof(OnBrowserProcessFailedPrefix));
+        Patch(hooks, "LogInitFailure", prefix: nameof(LogInitFailurePrefix));
+        Patch(hooks, "ReportWebUICrashDiagnostic", prefix: nameof(ReportWebUICrashDiagnosticPrefix));
+        Patch(hooks, "OnPageFailed", prefix: nameof(OnPageFailedPrefix));
         PatchPageMessages(harmony);
 
         // Never hook ClassifyDiagnosis: it takes Nullable<bool> by value, which Il2CppInterop's trampoline reads
@@ -38,7 +39,11 @@ internal static class WebUILayerPatches
         // The game logs the diagnosis itself ("WebUI: ... stage= diag= ...") once that call returns.
     }
 
-    /// <summary>Runs first so the probe's own page messages never reach the game or the other mods' hooks.</summary>
+    /// <summary>
+    /// Runs first so the probe's own page messages never reach the game or the other mods' hooks. Placed by hand rather
+    /// than through the Toolkit's page inbox, because it must run before every other hook and it also counts the other
+    /// mods' messages that pass by during a probe.
+    /// </summary>
     private static void PatchPageMessages(Harmony harmony)
     {
         try
@@ -51,26 +56,12 @@ internal static class WebUILayerPatches
         }
         catch (Exception ex)
         {
-            _log($"could not hook BaseWebView.HandleMessageEmitted: {ex.Message}");
+            _log($"{HookFailure.Prefix} BaseWebView.HandleMessageEmitted: {ex.Message}");
         }
     }
 
-    private static void Patch(Harmony harmony, string target, string? prefix = null, string? postfix = null)
-    {
-        try
-        {
-            var original = AccessTools.Method(typeof(WebUILayer), target) ?? throw new MissingMethodException(nameof(WebUILayer), target);
-
-            harmony.Patch(original, prefix: Hook(prefix), postfix: Hook(postfix));
-            _log($"hooked WebUILayer.{target}");
-        }
-        catch (Exception ex)
-        {
-            _log($"could not hook WebUILayer.{target}: {ex.Message}");
-        }
-    }
-
-    private static HarmonyMethod? Hook(string? name) => name is null ? null : new HarmonyMethod(typeof(WebUILayerPatches), name);
+    private static void Patch(PatchKit hooks, string target, string? prefix = null, string? postfix = null) =>
+        hooks.Patch(typeof(WebUILayerPatches), typeof(WebUILayer), target, prefix: prefix, postfix: postfix, done: $"hooked WebUILayer.{target}");
 
     private static void Guard(string hook, Action body)
     {

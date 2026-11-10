@@ -1,9 +1,11 @@
 using System;
-using System.IO;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
+using ExiledToolkit;
+using ExiledToolkit.Game;
+using ExiledToolkit.Kit;
 using HarmonyLib;
 using UnityEngine;
 using WebUIDoctor.Adapters;
@@ -12,16 +14,15 @@ using WebUIDoctor.Core;
 namespace WebUIDoctor;
 
 [BepInPlugin(Guid, "WebUI Doctor", Version)]
-[BepInDependency(OptionalLive.ToolkitGuid, BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency(ToolkitGuid, ">=0.19.0")]
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.6.2";
+    private const string Version = "0.6.3";
+    private const string ToolkitGuid = "com.dev.survivallog.exiledtoolkit";
 
     public override void Load()
     {
-        if (!OptionalLive.IsToolkitInstalled) Log.LogInfo(OptionalLive.MissingNote);
-
         var isHardRestartEnabled = Config.Bind("Recovery", "EnableHardRestart", true,
             "When the game's menus fail to load and the game gives up, restart the browser the menus run in and try again, instead of showing the error.\n当游戏菜单加载失败且游戏放弃恢复时，重启菜单所用的浏览器并重试，而不是显示错误。");
         var isExitLoggingEnabled = Config.Bind("Diagnostics", "LogChromiumExits", true,
@@ -30,7 +31,7 @@ public sealed class Plugin : BasePlugin
             new ConfigDescription("How many times a second the menus and HUD redraw. The game uses 30, which makes menus feel slow to answer the mouse; 60 makes them smooth. Takes effect the next time you start the game.\n菜单和 HUD 每秒重绘的次数。游戏自带 30，菜单对鼠标反应会显得迟钝；60 会流畅很多。下次启动游戏时生效。",
                 new AcceptableValueRange<int>(WebFrameRate.Min, WebFrameRate.Max)));
 
-        var log = new DoctorLog(Log, Path.Combine(Paths.BepInExRootPath, "webui-doctor.log"));
+        var log = new ModLog(Log, "webui-doctor.log") { MaxFileBytes = 1024 * 1024 };
         var gamePid = Environment.ProcessId;
         // No give-up: the game's error dialog blocks every click, so retrying is never worse than stopping.
         var settings = new RetrySettings(
@@ -49,16 +50,17 @@ public sealed class Plugin : BasePlugin
         log.Write($"===== WebUI Doctor {Version} started, game pid {gamePid} " +
                   $"backoff=[{string.Join(", ", settings.Backoff.Select(wait => $"{wait.TotalSeconds:0}s"))}] forgiveAfter={settings.ForgiveAfter.TotalMinutes:0}min");
         var harmony = new Harmony(Guid);
-        WebUILayerPatches.Apply(harmony, doctor, probe, log.Write);
-        WebFrameRatePatch.Apply(harmony, menuFrameRate, log.Write);
+        var hooks = new PatchKit(harmony, log.Write);
+        WebUILayerPatches.Apply(harmony, hooks, doctor, probe, log.Write);
+        WebFrameRatePatch.Apply(hooks, menuFrameRate, log.Write);
         DoctorTicker.Tick = doctor.Tick;
         DoctorTicker.Log = log.Write;
-        OptionalLive.Watch(isHardRestartEnabled, isOn =>
+        LiveSettings.Watch(isHardRestartEnabled, isOn =>
         {
             doctor.IsHardRestartEnabled = isOn;
             log.Write($"hardRestart={isOn}");
         });
-        OptionalLive.Watch(isExitLoggingEnabled, isOn =>
+        LiveSettings.Watch(isExitLoggingEnabled, isOn =>
         {
             exitWatcher.TurnOn(isOn);
             log.Write($"logChromiumExits={isOn}");

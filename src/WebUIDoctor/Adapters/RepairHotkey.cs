@@ -1,6 +1,7 @@
 using System;
+using ExiledToolkit;
+using ExiledToolkit.Kit;
 using UnityEngine;
-using WebUIDoctor.Core;
 
 namespace WebUIDoctor.Adapters;
 
@@ -11,7 +12,7 @@ namespace WebUIDoctor.Adapters;
 internal sealed class RepairHotkey
 {
     private static readonly Func<KeyCode, bool> IsCtrlKeyDown = key => (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(key);
-    private static readonly Func<bool> IsTyping = OptionalLive.IsTyping;
+    private static readonly Func<bool> IsTyping = () => Typing.IsActive;
 
     private readonly KeyCode _key;
     private readonly Action<string> _log;

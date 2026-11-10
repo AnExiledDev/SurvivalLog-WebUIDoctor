@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ExiledToolkit.Kit;
 using GameCore.HotUpdate.ReduxUI;
 using WebUIDoctor.Adapters;
 using WebUIDoctor.Core;
@@ -20,7 +21,7 @@ internal sealed class Doctor
     private static readonly TimeSpan ClockCheckAfterRepairDelay = TimeSpan.FromSeconds(40);
     private const int MaxReportedFaults = 20;
 
-    private readonly DoctorLog _log;
+    private readonly ModLog _log;
     private readonly RetrySettings _settings;
     private readonly int _gamePid;
     private readonly RepairHotkey _repairHotkey;
@@ -48,7 +49,7 @@ internal sealed class Doctor
     /// <summary>Whether a UI the game gave up on gets its Chromium killed and tried again. Set on the main thread.</summary>
     public bool IsHardRestartEnabled { get; set; }
 
-    public Doctor(DoctorLog log, RetrySettings settings, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock, ClickWatch clicks, TimeLift timeLift)
+    public Doctor(ModLog log, RetrySettings settings, int gamePid, RepairHotkey repairHotkey, RepairHotkey probeHotkey, PageProbe probe, ClockWatch clock, ClickWatch clicks, TimeLift timeLift)
     {
         _log = log;
         _settings = settings;

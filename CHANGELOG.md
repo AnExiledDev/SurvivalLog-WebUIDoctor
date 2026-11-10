@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3
+
+- Now uses Exiled's Toolkit for its shared parts, so it needs Exiled's Toolkit 0.19.0 or newer.
+- The log file `BepInEx\webui-doctor.log` now moves to `webui-doctor.log.1` once it passes 1 MB, instead of `webui-doctor.old.log`.
+- Made for Survival Log 1.1.20719.
+
 ## 0.6.2
 
 - Ctrl+F12 and Ctrl+F11 no longer go off while you type in a text box, such as a search box in another mod's window. This needs Exiled's Toolkit 0.12.0 or newer.

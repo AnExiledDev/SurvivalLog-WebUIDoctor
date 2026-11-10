@@ -1,7 +1,7 @@
 using System;
 using BepInEx.Configuration;
+using ExiledToolkit.Game;
 using GameCore.HotUpdate.ReduxUI;
-using HarmonyLib;
 using WebUIDoctor.Core;
 
 namespace WebUIDoctor.Adapters;
@@ -19,22 +19,12 @@ internal static class WebFrameRatePatch
     private static Action<string> _log = _ => { };
     private static uint _lastLogged;
 
-    public static void Apply(Harmony harmony, ConfigEntry<int> rate, Action<string> log)
+    public static void Apply(PatchKit hooks, ConfigEntry<int> rate, Action<string> log)
     {
         _rate = rate;
         _log = log;
 
-        try
-        {
-            var original = AccessTools.Method(typeof(WebUILayer), Target) ?? throw new MissingMethodException(nameof(WebUILayer), Target);
-
-            harmony.Patch(original, postfix: new HarmonyMethod(typeof(WebFrameRatePatch), nameof(Postfix)));
-            _log($"hooked WebUILayer.{Target}");
-        }
-        catch (Exception ex)
-        {
-            _log($"{HookFailure.Prefix} WebUILayer.{Target}: {ex.Message}");
-        }
+        hooks.Patch(typeof(WebFrameRatePatch), typeof(WebUILayer), Target, postfix: nameof(Postfix), done: $"hooked WebUILayer.{Target}");
     }
 
     private static void Postfix(string tierName, ref uint __result)
