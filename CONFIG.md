@@ -6,17 +6,17 @@ Settings live in `BepInEx\config\com.dev.survivallog.webuidoctor.cfg`, created t
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `EnableHardRestart` | `true` | When the game's menus fail to load and the game gives up, restart the browser the menus run in and try again, instead of showing the error. |
+| `EnableHardRestart` | `true` | When the game's menus crash and the game gives up trying to bring them back, restart the browser the menus run in and keep trying, instead of showing the error. |
 
-With `false`, the mod logs that the game gave up and lets the game's error dialog show. The UI repair after the game's recoveries, the clock check and both hotkeys keep working. The single browser restart that brings back the settings other UI mods need also still happens, whatever this setting says.
+With `false`, the mod writes in its log that the game gave up, and the game's error dialog shows. The UI repair after the game recovers the UI by itself, the clock check and both hotkeys still work. If other UI mods lose access to the game's pages after a recovery, the mod still restarts the browser once to fix that, whatever this setting says.
 
 ## Display
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `MenuFrameRate` | `60` | How many times a second the menus and HUD redraw, from 30 to 120. The game uses 30. |
+| `MenuFrameRate` | `60` | How many times a second the menus and HUD redraw, from 30 to 120. Without the mod, the game uses 30. |
 
-The game's browser takes this when it starts, so a change takes effect the next time you start the game, even on the Mods screen. A higher rate makes menus smoother and quicker to answer the mouse, and costs a little more graphics card time while a menu is open.
+The game's browser reads this when it starts, so a change takes effect the next time you start the game, even when you change it on the Mods screen. A higher rate makes menus smoother and quicker to react to the mouse, and uses a little more graphics card time while a menu is open.
 
 ## Diagnostics
 
@@ -24,4 +24,4 @@ The game's browser takes this when it starts, so a change takes effect the next 
 | --- | --- | --- |
 | `LogChromiumExits` | `true` | Log every Chromium process start and exit, with its exit code, to `BepInEx\webui-doctor.log`. |
 
-The processes are watched from a background thread twice a second. Turning this off only removes those log lines; recovery works the same.
+Turning this off only removes those log lines. Recovery works the same either way.

@@ -1,20 +1,20 @@
 Name: WebUI Doctor
-Summary: Gets the UI back when Survival Log shows its "interface display error". It restarts the game's browser and keeps retrying until the UI returns, then closes the error dialog, gives clicks back and releases a stuck pause. Ctrl+F12 repairs the UI by hand. Writes nothing to your save. Needs Exiled's Toolkit.
+Summary: Gets the UI back when Survival Log shows its "interface display error". It restarts the game's browser and keeps retrying until the UI returns, then closes the error dialog, gives clicks back and releases a stuck pause. Ctrl+F12 repairs the UI by hand. Menus also redraw 60 times a second by default. Writes nothing to your save. Needs Exiled's Toolkit.
 
 Description (BBCode):
 Survival Log draws its menus and HUD with a built-in browser. When that browser crashes and the game's recovery gives up, you are left with an error dialog and a dead UI. WebUI Doctor restarts the browser, keeps trying until the UI is back, and cleans up after the crash.
 
 [size=5]Main features[/size]
 [list]
-[*][b]Hard restart[/b]: when the game gives up, the mod restarts its browser and skips the "automatic recovery has failed" dialog.[/*]
-[*][b]Never gives up[/b]: retries after 3 seconds, then 10 seconds, 30 seconds, 1 minute, then every 2 minutes until the UI is back.[/*]
+[*][b]Hard restart[/b]: when the game gives up, the mod restarts the game's browser and skips the "automatic recovery has failed" dialog.[/*]
+[*][b]Never gives up[/b]: the first retry starts about 2 seconds after the game gives up. If the UI keeps failing, the mod waits longer between tries, about 5 seconds, then 15, then 30, and then 1 minute between every try until the UI is back.[/*]
 [*][b]UI repair[/b]: after every recovery it closes the error dialog and gives mouse clicks back to the UI.[/*]
 [*][b]Stuck pause release[/b]: a pause left over from the crash is resumed. A pause you set with the speed control is never touched.[/*]
 [*][b]Recovery while paused[/b]: the game's recovery waits on game time, which barely moves while paused. The mod runs time at normal speed until the UI is back, then pauses the game again.[/*]
 [*][b]Clicks on the world come back[/b]: if clicking an object while the UI was gone left every object unclickable (no menu to explore or sleep), the repair gives those clicks back.[/*]
 [*][b]Other UI mods keep working[/b]: the recovered browser gets back the settings those mods need, and if they are still missing, the browser is restarted once more.[/*]
-[*][b]UI clock check[/b]: once a minute it makes sure the clock on screen matches the game's time.[/*]
-[*][b]Smoother menus[/b]: menus and the HUD redraw 60 times a second instead of the game's 30, so they answer the mouse sooner. Change it with MenuFrameRate; it takes effect the next time you start the game.[/*]
+[*][b]UI clock check[/b]: every 15 seconds it makes sure the clock on screen matches the game's time.[/*]
+[*][b]Smoother menus[/b]: menus and the HUD redraw 60 times a second instead of 30, so they react to the mouse sooner. You can set anything from 30 to 120 with MenuFrameRate, and a change takes effect the next time you start the game.[/*]
 [*][b]Log file[/b]: everything it does goes to BepInEx\webui-doctor.log.[/*]
 [/list]
 
@@ -25,7 +25,7 @@ Survival Log draws its menus and HUD with a built-in browser. When that browser 
 [/list]
 These keys are fixed and cannot be changed.
 
-The mod writes nothing into your save. It only restarts the game's browser and resumes a pause it judges stuck. You can remove it at any time; the game then shows its error dialog again when its recovery gives up.
+The mod writes nothing into your save. It only restarts the game's browser and resumes a pause it thinks is stuck. You can remove it at any time. The game then shows its error dialog again when its recovery gives up.
 
 Works in English and Chinese.
 
@@ -60,11 +60,11 @@ Works in English and Chinese.
 Delete [font=Courier New]WebUIDoctor.dll[/font] from the [font=Courier New]BepInEx\plugins[/font] folder.
 
 [size=5]Configuration[/size]
-To turn the hard restart or the browser log off, edit [font=Courier New]BepInEx\config\com.dev.survivallog.webuidoctor.cfg[/font] while the game is closed, or do it in game on the Mod Manager's Mods screen, where changes take effect at once (see [url=https://github.com/AnExiledDev/SurvivalLog-WebUIDoctor/blob/main/CONFIG.md]CONFIG.md[/url]; the cfg file explains each setting in English and Chinese).
+You can turn the hard restart or the browser log off, or change the menu frame rate, in game on the Mod Manager's Mods screen. You can also edit [font=Courier New]BepInEx\config\com.dev.survivallog.webuidoctor.cfg[/font] while the game is closed. The cfg file explains each setting in English and Chinese, and [url=https://github.com/AnExiledDev/SurvivalLog-WebUIDoctor/blob/main/CONFIG.md]CONFIG.md[/url] lists them all.
 
 [size=5]Feedback[/size]
 Found a bug or have an idea? Come say hi on the [url=https://discord.gg/trTsyxUFqg]Core Directive Discord[/url], or post in this page's Posts tab. For bugs, please include [font=Courier New]BepInEx\LogOutput.log[/font] and [font=Courier New]BepInEx\webui-doctor.log[/font].
-To reach me directly, message [b]exiled.dev[/b] on Discord; you can find me in the [url=https://discord.gg/MZGg4gQAUe]official Survival Log Discord[/url]. I'm also on X as [url=https://x.com/AnExiledDev]@AnExiledDev[/url].
+To reach me directly, message [b]exiled.dev[/b] on Discord. You can find me in the [url=https://discord.gg/MZGg4gQAUe]official Survival Log Discord[/url]. I'm also on X as [url=https://x.com/AnExiledDev]@AnExiledDev[/url].
 
 [size=5]Source and license[/size]
 Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-WebUIDoctor]github.com/AnExiledDev/SurvivalLog-WebUIDoctor[/url]
@@ -72,19 +72,19 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-WebUIDoct
 [line]
 [size=5]简体中文[/size]
 
-Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、而游戏自己的恢复也放弃时，你只会看到一个错误对话框和一个无法操作的界面。WebUI Doctor 会重启浏览器，一直重试直到界面恢复，并在崩溃后清理残留问题。
+Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、游戏的自动恢复也放弃时，你只会看到一个错误对话框和一个无法操作的界面。WebUI Doctor 会重启浏览器，一直重试直到界面恢复，并在崩溃后清理残留问题。
 
 [size=5]主要功能[/size]
 [list]
-[*][b]强制重启[/b]：游戏放弃时，模组重启它的浏览器，并跳过「自动恢复失败」的对话框。[/*]
-[*][b]永不放弃[/b]：3 秒后重试，然后是 10 秒、30 秒、1 分钟，之后每 2 分钟一次，直到界面恢复。[/*]
+[*][b]强制重启[/b]：游戏放弃时，模组会重启游戏的浏览器，并跳过「自动恢复失败」的对话框。[/*]
+[*][b]永不放弃[/b]：游戏放弃后大约 2 秒开始第一次重试。如果界面一直失败，每次重试之间会等得更久：大约 5 秒，然后 15 秒、30 秒，之后每次间隔 1 分钟，直到界面恢复。[/*]
 [*][b]界面修复[/b]：每次恢复后关闭错误对话框，并把鼠标点击还给界面。[/*]
 [*][b]解除卡住的暂停[/b]：崩溃遗留的暂停会被恢复。你用速度控制设置的暂停不会被改动。[/*]
 [*][b]暂停时也能恢复[/b]：游戏的恢复要等游戏时间，而暂停时游戏时间几乎不动。模组会在界面恢复前让时间以正常速度运行，之后再次暂停游戏。[/*]
 [*][b]恢复对场景物体的点击[/b]：如果界面消失时点击了物体，导致所有物体都无法点击（没有探索或睡觉菜单），修复会恢复这些点击。[/*]
-[*][b]其他界面模组继续工作[/b]：恢复后的浏览器会重新获得这些模组需要的设置；如果仍然缺失，会再重启一次浏览器。[/*]
-[*][b]界面时钟检查[/b]：每分钟确认一次屏幕上的时钟与游戏时间一致。[/*]
-[*][b]更流畅的菜单[/b]：菜单和 HUD 每秒重绘 60 次，而不是游戏自带的 30 次，对鼠标的反应更快。可用 MenuFrameRate 修改，下次启动游戏时生效。[/*]
+[*][b]其他界面模组继续工作[/b]：恢复后的浏览器会重新获得这些模组需要的设置。如果仍然缺失，会再重启一次浏览器。[/*]
+[*][b]界面时钟检查[/b]：每 15 秒确认一次屏幕上的时钟与游戏时间一致。[/*]
+[*][b]更流畅的菜单[/b]：菜单和 HUD 每秒重绘 60 次，而不是 30 次，对鼠标的反应更快。可以用 MenuFrameRate 设为 30 到 120 之间的任意值，改动在下次启动游戏时生效。[/*]
 [*][b]日志文件[/b]：它做的每件事都会写入 BepInEx\webui-doctor.log。[/*]
 [/list]
 
@@ -95,13 +95,13 @@ Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、
 [/list]
 这些按键是固定的，不能修改。
 
-模组不会往存档里写入任何内容。它只会重启游戏自己的浏览器，并恢复它判断为卡住的暂停。你可以随时移除它；移除后，游戏在恢复放弃时会再次显示错误对话框。
+模组不会往存档里写入任何内容。它只会重启游戏的浏览器，并恢复它判断为卡住的暂停。你可以随时移除它。移除后，游戏在恢复放弃时会再次显示错误对话框。
 
 支持英文和中文。
 
 [size=5]已知问题[/size]
 [list]
-[*]它无法阻止浏览器崩溃。界面恢复期间会消失几秒钟（多次崩溃后会更久）。[/*]
+[*]它无法阻止浏览器崩溃。恢复期间界面会消失几秒钟（多次崩溃后会更久）。[/*]
 [*]即使游戏认为有窗口打开，Ctrl+F12 也会解除暂停。只有你用速度控制设置的暂停不受影响。[/*]
 [*]残留的错误面板是通过英文或中文文字识别的。使用其他语言时，你可能需要自己关闭它。[/*]
 [/list]
@@ -128,7 +128,7 @@ Survival Log 用内置浏览器绘制菜单和 HUD。当这个浏览器崩溃、
 从 [font=Courier New]BepInEx\plugins[/font] 文件夹中删除 [font=Courier New]WebUIDoctor.dll[/font]。
 
 [size=5]配置[/size]
-如需关闭强制重启或浏览器日志，可以在游戏内 Mod Manager 的「模组」界面修改（改动立即生效），也可以在游戏关闭时编辑 [font=Courier New]BepInEx\config\com.dev.survivallog.webuidoctor.cfg[/font]。配置文件中每项设置都有中文说明，完整说明见 [url=https://github.com/AnExiledDev/SurvivalLog-WebUIDoctor/blob/main/CONFIG.md]CONFIG.md[/url]（英文）。
+如需关闭强制重启或浏览器日志，或修改菜单帧率，可以在游戏内 Mod Manager 的「模组」界面修改（改动立即生效），也可以在游戏关闭时编辑 [font=Courier New]BepInEx\config\com.dev.survivallog.webuidoctor.cfg[/font]。配置文件中每项设置都有中文说明，完整说明见 [url=https://github.com/AnExiledDev/SurvivalLog-WebUIDoctor/blob/main/CONFIG.md]CONFIG.md[/url]（英文）。
 
 [size=5]反馈[/size]
 发现 bug 或有好点子？欢迎来 [url=https://discord.gg/trTsyxUFqg]Core Directive Discord[/url] 打个招呼，或在本页的「Posts」标签里发帖。报告 bug 时，请附上 [font=Courier New]BepInEx\LogOutput.log[/font] 和 [font=Courier New]BepInEx\webui-doctor.log[/font]。

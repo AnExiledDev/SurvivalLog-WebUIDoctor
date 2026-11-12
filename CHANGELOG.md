@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.5
+
+- Clearer wording in the settings.
+- Made for Survival Log 1.1.20719.
+
 ## 0.6.4
 
 - If the game crashes, `BepInEx\webui-doctor.log` now keeps the last lines from before the crash.
@@ -8,7 +13,7 @@
 
 ## 0.6.3
 
-- Now uses Exiled's Toolkit for its shared parts, so it needs Exiled's Toolkit 0.19.0 or newer.
+- Now needs Exiled's Toolkit 0.19.0 or newer, because some of the mod's code moved into it.
 - The log file `BepInEx\webui-doctor.log` now moves to `webui-doctor.log.1` once it passes 1 MB, instead of `webui-doctor.old.log`.
 - Made for Survival Log 1.1.20719.
 
@@ -24,7 +29,8 @@
 
 ## 0.6.0
 
-- Menus and the HUD redraw 60 times a second instead of the game's 30, so they feel smooth and answer the mouse sooner. The new `MenuFrameRate` setting (30 to 120) changes this; a change takes effect the next time you start the game.
+- Menus and the HUD now redraw 60 times a second instead of 30, so they feel smoother and react to the mouse sooner.
+- The new `MenuFrameRate` setting sets how often they redraw, from 30 to 120. A change takes effect the next time you start the game.
 - Made for Survival Log 1.1.19611.
 
 ## 0.5.1
@@ -45,8 +51,10 @@
 Changes since 0.3.5:
 
 - The UI comes back when it breaks while the game is paused.
-- Clicks in the world work again after a UI recovery, and pages keep their access settings across a recovery.
-- Pages keep steadier time, the UI recovers faster, and the log file stays smaller.
-- No longer touches the game's crash report, which it used to break.
-- Every config entry is explained in plain English and Simplified Chinese.
-- The mod only reads game objects after the game has built them.
+- Clicking objects in the world works again after the UI recovers.
+- Other UI mods keep working after the UI recovers.
+- The clock on screen stays closer to the game's time.
+- The UI recovers faster, and the log file stays smaller.
+- The mod no longer breaks the game's crash report.
+- Every setting is explained in English and Simplified Chinese.
+- The mod waits for the game to finish loading its parts before it reads them.

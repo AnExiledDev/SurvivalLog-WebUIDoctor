@@ -18,17 +18,17 @@ namespace WebUIDoctor;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.webuidoctor";
-    private const string Version = "0.6.4";
+    private const string Version = "0.6.5";
     private const string ToolkitGuid = "com.dev.survivallog.exiledtoolkit";
 
     public override void Load()
     {
         var isHardRestartEnabled = Config.Bind("Recovery", "EnableHardRestart", true,
-            "When the game's menus fail to load and the game gives up, restart the browser the menus run in and try again, instead of showing the error.\n当游戏菜单加载失败且游戏放弃恢复时，重启菜单所用的浏览器并重试，而不是显示错误。");
+            "When the game's menus crash and the game gives up trying to bring them back, restart the browser the menus run in and keep trying, instead of showing the error.\n当游戏菜单崩溃、游戏放弃恢复时，重启菜单所用的浏览器并继续重试，而不是显示错误。");
         var isExitLoggingEnabled = Config.Bind("Diagnostics", "LogChromiumExits", true,
             new ConfigDescription("Log every Chromium process start and exit (with exit code) to BepInEx/webui-doctor.log.\n把每个 Chromium 进程的启动和退出（含退出代码）记录到 BepInEx/webui-doctor.log。", null, "ModManager.Advanced"));
         var menuFrameRate = Config.Bind("Display", "MenuFrameRate", WebFrameRate.Default,
-            new ConfigDescription("How many times a second the menus and HUD redraw. The game uses 30, which makes menus feel slow to answer the mouse; 60 makes them smooth. Takes effect the next time you start the game.\n菜单和 HUD 每秒重绘的次数。游戏自带 30，菜单对鼠标反应会显得迟钝；60 会流畅很多。下次启动游戏时生效。",
+            new ConfigDescription("How many times a second the menus and HUD redraw. The game normally uses 30, which makes menus slow to react to the mouse. At 60 they feel smooth. A change takes effect the next time you start the game.\n菜单和 HUD 每秒重绘的次数。游戏默认是 30，菜单对鼠标的反应会比较慢。设为 60 会流畅很多。改动在下次启动游戏时生效。",
                 new AcceptableValueRange<int>(WebFrameRate.Min, WebFrameRate.Max)));
 
         var log = new ModLog(Log, "webui-doctor.log") { MaxFileBytes = 1024 * 1024, WritesAtOnce = true };
